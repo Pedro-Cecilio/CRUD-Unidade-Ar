@@ -1,58 +1,75 @@
 package com.dbserver.crud.controllers;
 
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.pessoa.PessoaRepository;
-import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
-
-import java.io.IOException;
 import java.time.LocalDate;
 
 @SpringBootTest
 @AutoConfigureJsonTesters
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 class PessoaControllerTest {
 
     @Autowired
-    private JacksonTester<CriarPessoaDTO> criarPessoaJson;
+    private JacksonTester<CriarPessoaDto> criarPessoaJson;
 
-    @BeforeEach
+    @Autowired
+    private PessoaRepository pessoaRepository;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @AfterEach 
     void setUp() {
-        baseURI = "http://localhost";
-        port = 8080;
+        this.pessoaRepository.deleteAll();
     }
 
     @Test
-    void givenUsuarioWhenCriarPessoaThenRetornarStatus201() throws IOException {
-        CriarPessoaDTO novaPessoa = new CriarPessoaDTO("Pedro", LocalDate.of(2000, 12, 15), "12345678911");
-        given()
-                .body(criarPessoaJson.write(novaPessoa).getJson())
-                .contentType("application/json")
-                .when()
-                .post("/pessoa")
-                .then()
-                .log().all()
-                .statusCode(201);
+    @DisplayName("Deve retornar Status 201 ao criar pessoa sem endereço")
+    void deveCriarPessoaSemEndereco() throws Exception {
+        CriarPessoaDto novaPessoa = new CriarPessoaDto("Pedro", LocalDate.of(2000, 12, 15), "12345678911", null);
 
+        MockHttpServletResponse resposta = mockMvc.perform(MockMvcRequestBuilders
+                .post("/pessoa")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(criarPessoaJson.write(novaPessoa).getJson()))
+                .andReturn().getResponse();
+        System.out.println(resposta.getContentAsString());
+        assertThat(resposta.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+    }
+    @Test
+    @DisplayName("Deve retornar Status 201 ao criar pessoa com endereço")
+    void deveCriarPessoaComEndereco() throws Exception {
+        CriarEnderecoDto novoEndereco = new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu", "Belo Horizonte", "Minas Gerais", "31872140");
+        CriarPessoaDto novaPessoa = new CriarPessoaDto("Pedro", LocalDate.of(2000, 12, 15), "12345678911", List.of(novoEndereco));
+
+        MockHttpServletResponse resposta = mockMvc.perform(MockMvcRequestBuilders
+                .post("/pessoa")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(criarPessoaJson.write(novaPessoa).getJson()))
+                .andReturn().getResponse();
+        System.out.println(resposta.getContentAsString());
+        assertThat(resposta.getStatus()).isEqualTo(HttpStatus.CREATED.value());
     }
 }
