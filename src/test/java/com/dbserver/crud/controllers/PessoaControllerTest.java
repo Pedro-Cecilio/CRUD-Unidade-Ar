@@ -15,6 +15,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
@@ -48,7 +49,7 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar Status 201 ao criar pessoa sem endereço")
     void deveCriarPessoaSemEndereco() throws Exception {
-        CriarPessoaDto novaPessoa = new CriarPessoaDto("Pedro", LocalDate.of(2000, 12, 15), "12345678911", null);
+        CriarPessoaDto novaPessoa = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15), "12345678911", null);
 
         MockHttpServletResponse resposta = mockMvc.perform(MockMvcRequestBuilders
                 .post("/pessoa")
@@ -60,9 +61,10 @@ class PessoaControllerTest {
     }
     @Test
     @DisplayName("Deve retornar Status 201 ao criar pessoa com endereço")
+    @WithMockUser
     void deveCriarPessoaComEndereco() throws Exception {
-        CriarEnderecoDto novoEndereco = new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu", "Belo Horizonte", "Minas Gerais", "31872140");
-        CriarPessoaDto novaPessoa = new CriarPessoaDto("Pedro", LocalDate.of(2000, 12, 15), "12345678911", List.of(novoEndereco));
+        CriarEnderecoDto novoEndereco = new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu", "Belo Horizonte", "Minas Gerais", "31872140", null);
+        CriarPessoaDto novaPessoa = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15), "12345678911", List.of(novoEndereco));
 
         MockHttpServletResponse resposta = mockMvc.perform(MockMvcRequestBuilders
                 .post("/pessoa")

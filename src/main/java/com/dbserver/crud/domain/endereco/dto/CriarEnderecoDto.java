@@ -17,6 +17,8 @@ public record CriarEnderecoDto(
 
     @Pattern(regexp = "\\b\\d{8}\\b", message = "Cep com formato inválido")
     @NotBlank
-    String cep
+    String cep,
+
+    Boolean principal
 ) {}
 
