@@ -30,7 +30,7 @@ public record CriarPessoaDto(
         LocalDate dataNascimento,
 
         @NotBlank
-        @Size(min = 11, max = 11, message = "O cpf deve conter 11 caracteres")
+        @Pattern(regexp = "\\b\\d{11}\\b", message = "O cpf deve conter 11 caracteres numéricos" )
         String cpf,
 
         List<CriarEnderecoDto> enderecos

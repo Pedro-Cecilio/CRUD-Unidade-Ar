@@ -7,6 +7,7 @@ import com.dbserver.crud.domain.endereco.Endereco;
 import com.dbserver.crud.domain.pessoa.Pessoa;
 
 import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record AtualizarDadosPessoaDto(
@@ -17,7 +18,7 @@ public record AtualizarDadosPessoaDto(
 
         LocalDate dataNascimento,
 
-        @Size(min = 11, max = 11, message = "O cpf deve conter 11 caracteres")
+        @Pattern(regexp = "\\b\\d{11}\\b", message = "O cpf deve conter 11 caracteres numéricos" )
         String cpf
 
         ) {

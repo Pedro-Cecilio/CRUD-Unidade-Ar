@@ -7,6 +7,7 @@ import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
 import java.util.List;
+import static com.dbserver.crud.utils.Utils.validarCpf;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
@@ -122,8 +123,8 @@ public class Pessoa implements UserDetails {
     public void setCpf(String cpf) {
         if (cpf == null)
             throw new IllegalArgumentException("Cpf deve ser informada");
-        if (cpf.length() != 11)
-            throw new IllegalArgumentException("Cpf deve ter 11 caracteres");
+        if (!validarCpf(cpf))
+            throw new IllegalArgumentException("Cpf deve ter 11 caracteres numéricos");
         this.cpf = cpf;
     }
 

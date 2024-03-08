@@ -75,7 +75,7 @@ class PessoaServiceTest {
         assertThrows(IllegalArgumentException.class, () -> this.pessoaService.criarPessoa(dto));
     }
     @Test
-    @DisplayName("Não Deve ser possível criar uma pessoa com cpf sem ter exatos 11 caracteres")
+    @DisplayName("Não Deve ser possível criar uma pessoa com cpf sem ter exatos 11 caracteres numéricos")
     void deveFalharAoCriarPessoaComCpfInvalido() {
         CriarPessoaDto dto = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15), "1234567891",
                 List.of());
@@ -85,7 +85,7 @@ class PessoaServiceTest {
     @Test
     @DisplayName("Não Deve ser possível criar uma pessoa com login nulo")
     void deveFalharAoCriarPessoaComLoginNulo() {
-        CriarPessoaDto dto = new CriarPessoaDto(null, "123456", "Pedro", LocalDate.of(2000, 12, 15), "1234567891",
+        CriarPessoaDto dto = new CriarPessoaDto(null, "123456", "Pedro", LocalDate.of(2000, 12, 15), "12345678910",
                 List.of());
 
         assertThrows(IllegalArgumentException.class, () -> this.pessoaService.criarPessoa(dto));
@@ -93,7 +93,7 @@ class PessoaServiceTest {
     @Test
     @DisplayName("Não Deve ser possível criar uma pessoa com data nula")
     void deveFalharAoCriarPessoaComDataNula() {
-        CriarPessoaDto dto = new CriarPessoaDto(null, "123456", "Pedro", null, "1234567891",
+        CriarPessoaDto dto = new CriarPessoaDto("temtr", "123456", "Pedro", null, "12345678910",
                 List.of());
 
         assertThrows(IllegalArgumentException.class, () -> this.pessoaService.criarPessoa(dto));
