@@ -52,7 +52,7 @@ class PessoaControllerTest {
         CriarPessoaDto novaPessoa = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15), "12345678911", null);
 
         MockHttpServletResponse resposta = mockMvc.perform(MockMvcRequestBuilders
-                .post("/pessoa")
+                .post("/pessoa/novo")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(criarPessoaJson.write(novaPessoa).getJson()))
                 .andReturn().getResponse();
@@ -67,7 +67,7 @@ class PessoaControllerTest {
         CriarPessoaDto novaPessoa = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15), "12345678911", List.of(novoEndereco));
 
         MockHttpServletResponse resposta = mockMvc.perform(MockMvcRequestBuilders
-                .post("/pessoa")
+                .post("/pessoa/novo")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(criarPessoaJson.write(novaPessoa).getJson()))
                 .andReturn().getResponse();

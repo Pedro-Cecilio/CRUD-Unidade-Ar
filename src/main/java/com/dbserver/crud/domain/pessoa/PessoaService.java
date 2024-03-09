@@ -33,7 +33,8 @@ public class PessoaService {
     public Pessoa salvarPessoa(CriarPessoaDto criarPessoaDTO) {
         Pessoa pessoa = new Pessoa(criarPessoaDTO, this.passwordEnconder);
         List<CriarEnderecoDto> enderecos = criarPessoaDTO.enderecos();
-        if(!enderecos.isEmpty()) {
+        this.pessoaRepository.save(pessoa);
+        if(enderecos != null && !enderecos.isEmpty()) {
             enderecos.forEach(endereco ->{
                 Endereco novoEndereco = new Endereco(endereco);
                 novoEndereco.setPessoa(pessoa);
