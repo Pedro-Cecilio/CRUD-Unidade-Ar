@@ -3,28 +3,23 @@ package com.dbserver.crud.domain.pessoa;
 import java.time.LocalDate;
 
 import com.dbserver.crud.domain.endereco.Endereco;
-import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.List;
 import static com.dbserver.crud.utils.Utils.validarCpf;
-
-import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
@@ -56,8 +51,8 @@ public class Pessoa implements UserDetails {
     @Size(min = 11, max = 11, message = "Cpf deve conter 11 caracteres.")
     private String cpf;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "pessoa_id")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "pessoa")
+    @JsonManagedReference
     private List<Endereco> endereco = new ArrayList<>();
 
     protected Pessoa() {
@@ -70,24 +65,20 @@ public class Pessoa implements UserDetails {
         setNome(novaPessoa.nome());
         setDataNascimento(novaPessoa.dataNascimento());
         setCpf(novaPessoa.cpf());
-        setEndereco(novaPessoa.enderecos());
     }
 
     public void atualizarDados(AtualizarDadosPessoaDto dados, PasswordEncoder passwordEnconder) {
-        setSenha(dados.senha() != null ? dados.senha() : this.senha, passwordEnconder);
+        setSenha(dados.senha() != null && !dados.senha().isEmpty() ? dados.senha() : this.senha, passwordEnconder);
         setDataNascimento(dados.dataNascimento() != null ? dados.dataNascimento() : this.dataNascimento);
-        setCpf(dados.cpf() != null ? dados.cpf() : this.cpf);
-        setNome(dados.nome() != null ? dados.nome() : this.nome);
+        setCpf(dados.cpf() != null && !dados.cpf().isEmpty() ? dados.cpf() : this.cpf);
+        setNome(dados.nome() != null && !dados.nome().isEmpty() ? dados.nome() : this.nome);
     }
 
-    public void setEndereco(List<CriarEnderecoDto> enderecos) {
-        if (enderecos == null || enderecos.isEmpty()) {
+    public void setEndereco(Endereco endereco) {
+        if (endereco == null) {
             return;
         }
-        enderecos.stream().forEach(novoEnderecoDto -> {
-            Endereco novoEndereco = new Endereco(novoEnderecoDto);
-            this.endereco.add(novoEndereco);
-        });
+        this.endereco.add(endereco);
     }
 
     public void setLogin(String login) {
@@ -99,15 +90,14 @@ public class Pessoa implements UserDetails {
     }
 
     public void setSenha(String senha, PasswordEncoder passwordEnconder) {
-        if(senha.length() < 6){
+        if (senha == null || senha.length() < 6) {
             throw new IllegalArgumentException("A senha deve conter no mínimo 6 caracteres");
         }
         this.senha = passwordEnconder.encode(senha);
-
     }
 
-    public void setDataNascimento(LocalDate data){
-        if(data == null){
+    public void setDataNascimento(LocalDate data) {
+        if (data == null) {
             throw new IllegalArgumentException("Data de nascimento deve ser informada");
         }
         this.dataNascimento = data;
@@ -117,7 +107,7 @@ public class Pessoa implements UserDetails {
             throw new IllegalArgumentException("Nome deve ser informada");
         if (nome.length() < 3)
             throw new IllegalArgumentException("Nome deve ter no mínimo 3 caracteres");
-        this.nome = nome;
+        this.nome = nome.trim();
     }
 
     public void setCpf(String cpf) {
@@ -128,6 +118,9 @@ public class Pessoa implements UserDetails {
         this.cpf = cpf;
     }
 
+    public boolean compararSenha(String senha, PasswordEncoder passwordEnconder) {
+        return passwordEnconder.matches(senha, this.getSenha());
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

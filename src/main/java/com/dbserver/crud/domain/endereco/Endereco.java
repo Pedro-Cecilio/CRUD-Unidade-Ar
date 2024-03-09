@@ -2,8 +2,7 @@ package com.dbserver.crud.domain.endereco;
 
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.pessoa.Pessoa;
-
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,14 +11,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "endereco")
 @Getter
-public class Endereco{
+public class Endereco {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +27,7 @@ public class Endereco{
 
     @Column(nullable = false)
     private String numero;
-    
+
     @Column(nullable = false)
     private String bairro;
 
@@ -42,11 +39,17 @@ public class Endereco{
 
     @Column(nullable = false)
     private String cep;
-    
+
     @Column(nullable = false)
     private Boolean principal = false;
 
-    protected Endereco(){}
+    @ManyToOne
+    @JoinColumn(name = "pessoa_id")
+    @JsonBackReference
+    private Pessoa pessoa;
+
+    protected Endereco() {
+    }
 
     public Endereco(CriarEnderecoDto endereco) {
         this.rua = endereco.rua();
@@ -57,10 +60,17 @@ public class Endereco{
         this.cep = endereco.cep();
         setPrincipal(endereco.principal());
     }
-    
-    public void setPrincipal(Boolean principal){
-        if(principal != null){
+
+    public void setPrincipal(Boolean principal) {
+        if (principal != null) {
             this.principal = principal;
         }
     }
+
+    public void setPessoa(Pessoa pessoa) {
+        if (pessoa != null) {
+            this.pessoa = pessoa;
+        }
+    }
+
 }

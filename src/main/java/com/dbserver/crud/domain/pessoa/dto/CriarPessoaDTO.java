@@ -10,7 +10,6 @@ import com.dbserver.crud.infra.jsonDeserializer.LocalDateDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -24,6 +23,7 @@ public record CriarPessoaDto(
         String senha,
 
         @NotBlank
+        @Size(min = 3, message = "Nome deve ter no mínimo 3 caracteres")
         String nome,
 
         @JsonDeserialize(using = LocalDateDeserializer.class)
