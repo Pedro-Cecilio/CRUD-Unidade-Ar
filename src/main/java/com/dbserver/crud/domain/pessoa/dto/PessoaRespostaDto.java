@@ -27,7 +27,7 @@ public record PessoaRespostaDto(
     }
     private static List<EnderecoRespostaDto> gerarEnderecoRespostaDtos(List<Endereco> enderecos){
         List<EnderecoRespostaDto> enderecosResposta = new ArrayList<>();
-        enderecos.forEach((endereco)->{
+        enderecos.forEach(endereco->{
             EnderecoRespostaDto enderecoResposta = new EnderecoRespostaDto(endereco);
             enderecosResposta.add(enderecoResposta);
         });

@@ -5,9 +5,10 @@ import java.time.LocalDate;
 import com.dbserver.crud.domain.endereco.Endereco;
 import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
+import com.dbserver.crud.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.List;
-import static com.dbserver.crud.utils.Utils.validarCpf;
+import static com.dbserver.crud.utils.Utils.validarRegex;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -113,7 +114,7 @@ public class Pessoa implements UserDetails {
     public void setCpf(String cpf) {
         if (cpf == null)
             throw new IllegalArgumentException("Cpf deve ser informada");
-        if (!validarCpf(cpf))
+        if (!validarRegex(Utils.REGEX_CPF, cpf))
             throw new IllegalArgumentException("Cpf deve ter 11 caracteres numéricos");
         this.cpf = cpf;
     }

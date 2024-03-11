@@ -54,10 +54,6 @@ public class TokenService {
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }
 
-    public Long pegarIdDaPessoaLogada() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Pessoa pessoaLogada = (Pessoa) authentication.getPrincipal();
-        return  pessoaLogada.getId();
-    }
+    
 
 }

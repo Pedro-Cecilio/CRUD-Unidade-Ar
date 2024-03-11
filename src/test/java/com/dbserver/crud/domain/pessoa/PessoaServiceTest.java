@@ -75,6 +75,27 @@ class PessoaServiceTest {
                 assertEquals(dto.cpf(), resposta.getCpf());
                 assertEquals(dto.enderecos().size(), resposta.getEndereco().size());
         }
+        @Test
+        @DisplayName("Deve ser possível criar uma pessoa com mais de um endereço")
+        void deveCriarPessoaComMaisDeUmEndereco() {
+                CriarEnderecoDto criarEnderecoDto = new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
+                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", true);
+
+                CriarEnderecoDto criarEnderecoDto2 = new CriarEnderecoDto("Gêmeos", "1", "Ribeiro de Abreu",
+                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", false);
+
+                List<CriarEnderecoDto> enderecos = List.of(criarEnderecoDto, criarEnderecoDto2);
+                CriarPessoaDto dto = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15),
+                                "12345678910",
+                                enderecos);
+                Pessoa resposta = this.pessoaService.salvarPessoa(dto);
+                assertEquals(dto.nome(), resposta.getNome());
+                assertEquals(dto.login(), resposta.getLogin());
+                assertEquals(dto.dataNascimento().toString(), resposta.getDataNascimento().toString());
+                assertEquals(dto.cpf(), resposta.getCpf());
+                assertEquals(dto.enderecos().size(), resposta.getEndereco().size());
+        }
+        
 
         @Test
         @DisplayName("Deve ser possível criar uma pessoa ao passar dados corretamente, sem passar endereço")

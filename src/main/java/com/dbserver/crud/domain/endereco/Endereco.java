@@ -1,7 +1,10 @@
 package com.dbserver.crud.domain.endereco;
 
+import static com.dbserver.crud.utils.Utils.validarRegex;
+import com.dbserver.crud.domain.endereco.dto.AtualizarEnderecoDto;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.pessoa.Pessoa;
+import com.dbserver.crud.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -61,6 +64,15 @@ public class Endereco {
         setPrincipal(endereco.principal());
     }
 
+    public void atualizarDados(AtualizarEnderecoDto dados) {
+        this.rua = dados.rua() != null && !dados.rua().isEmpty() ? dados.rua() : this.rua;
+        this.numero = dados.numero() != null && !dados.numero().isEmpty() ? dados.numero() : this.numero;
+        this.bairro = dados.bairro() != null && !dados.bairro().isEmpty() ? dados.bairro() : this.bairro;
+        this.cidade = dados.cidade() != null && !dados.cidade().isEmpty() ? dados.cidade() : this.cidade;
+        this.estado = dados.estado() != null && !dados.estado().isEmpty() ? dados.estado() : this.estado;
+        this.cep = dados.cep() != null && !dados.cep().isEmpty() ? dados.cep() : this.cep;
+    }
+
     public void setPrincipal(Boolean principal) {
         if (principal != null) {
             this.principal = principal;
@@ -71,6 +83,21 @@ public class Endereco {
         if (pessoa != null) {
             this.pessoa = pessoa;
         }
+    }
+
+    public void setNumero(String numero) {
+        if (numero == null)
+            throw new IllegalArgumentException("Número deve ser informado");
+        if (!validarRegex(Utils.REGEX_NUMERO_ENDERECO, numero))
+            throw new IllegalArgumentException("Número deve ter somente caracteres numéricos");
+        this.numero = numero;
+    }
+
+    public void setCep(String cep) {
+        if (cep == null)
+            throw new IllegalArgumentException("Cep deve ser informado");
+        if (!validarRegex(Utils.REGEX_CEP, cep))
+            throw new IllegalArgumentException("Número deve ter 8 caracteres numéricos");
     }
 
 }

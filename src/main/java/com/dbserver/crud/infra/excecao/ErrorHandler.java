@@ -1,5 +1,6 @@
 package com.dbserver.crud.infra.excecao;
 
+import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,6 +13,9 @@ import javax.naming.AuthenticationException;
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -43,6 +47,15 @@ public class ErrorHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ResponseError<String>> handleErrorAccessDenied(AccessDeniedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseError<String>(e.getMessage()));
+    }
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ResponseError<String>> handleNoSuchElementException(NoSuchElementException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseError<String>(e.getMessage()));
+    }
+    @ExceptionHandler(PSQLException.class)
+    public ResponseEntity<ResponseError<String>> handlePSQLExceptionn(PSQLException e) {
+        List<String> mensagemDeErro = Arrays.asList(e.getMessage().split("Detalhe:"));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseError<String>(mensagemDeErro.get(1).trim()));
     }
 
 }

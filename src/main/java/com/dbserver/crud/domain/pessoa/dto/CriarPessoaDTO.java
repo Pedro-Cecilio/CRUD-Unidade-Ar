@@ -2,9 +2,6 @@ package com.dbserver.crud.domain.pessoa.dto;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import org.springframework.validation.annotation.Validated;
-
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.infra.jsonDeserializer.LocalDateDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -30,7 +27,7 @@ public record CriarPessoaDto(
         LocalDate dataNascimento,
 
         @NotBlank
-        @Pattern(regexp = "\\b\\d{11}\\b", message = "O cpf deve conter 11 caracteres numéricos" )
+        @Pattern(regexp = "^\\d{11}+$", message = "O cpf deve conter 11 caracteres numéricos" )
         String cpf,
 
         List<CriarEnderecoDto> enderecos

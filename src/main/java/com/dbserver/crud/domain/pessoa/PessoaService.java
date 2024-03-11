@@ -3,6 +3,8 @@ package com.dbserver.crud.domain.pessoa;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.dbserver.crud.domain.endereco.Endereco;
@@ -12,22 +14,20 @@ import com.dbserver.crud.domain.endereco.dto.EnderecoService;
 import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.PessoaRespostaDto;
-import com.dbserver.crud.infra.security.TokenService;
 
 @Service
 public class PessoaService {
 
     private PessoaRepository pessoaRepository;
     private PasswordEncoder passwordEnconder;
-    private TokenService tokenService;
     private EnderecoRepository enderecoRepository;
+    private EnderecoService enderecoService;
 
-    public PessoaService(PessoaRepository pessoaRepository, PasswordEncoder passwordEnconder,
-            TokenService tokenService, EnderecoRepository enderecoRepository) {
+    public PessoaService(PessoaRepository pessoaRepository, PasswordEncoder passwordEnconder, EnderecoRepository enderecoRepository, EnderecoService enderecoService) {
         this.pessoaRepository = pessoaRepository;
         this.passwordEnconder = passwordEnconder;
-        this.tokenService = tokenService;
         this.enderecoRepository = enderecoRepository;
+        this.enderecoService = enderecoService;
     }
 
     public Pessoa salvarPessoa(CriarPessoaDto criarPessoaDTO) {
@@ -38,7 +38,11 @@ public class PessoaService {
             enderecos.forEach(endereco ->{
                 Endereco novoEndereco = new Endereco(endereco);
                 novoEndereco.setPessoa(pessoa);
-                this.enderecoRepository.save(novoEndereco);
+                if(novoEndereco.getPrincipal().equals(true)){
+                    this.enderecoService.definirComoEnderecoPrincipal(pessoa.getId(), novoEndereco);
+                }else{
+                    this.enderecoRepository.save(novoEndereco);
+                }
                 pessoa.setEndereco(novoEndereco);
             });
         }
@@ -57,10 +61,16 @@ public class PessoaService {
     }
 
     public Pessoa pegarPessoaLogada() {
-        Optional<Pessoa> pessoa = this.pessoaRepository.findById(this.tokenService.pegarIdDaPessoaLogada());
+        Optional<Pessoa> pessoa = this.pessoaRepository.findById(this.pegarIdDaPessoaLogada());
         if (pessoa.isPresent()) {
             return pessoa.get();
         }
         throw new NoSuchElementException("Usuário não encontrado");
+    }
+
+    public Long pegarIdDaPessoaLogada() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Pessoa pessoaLogada = (Pessoa) authentication.getPrincipal();
+        return  pessoaLogada.getId();
     }
 }
