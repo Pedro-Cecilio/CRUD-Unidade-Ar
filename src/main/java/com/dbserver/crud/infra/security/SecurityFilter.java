@@ -3,17 +3,12 @@ package com.dbserver.crud.infra.security;
 
 import java.io.IOException;
 import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.dbserver.crud.domain.pessoa.Pessoa;
 import com.dbserver.crud.domain.pessoa.PessoaRepository;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,11 +16,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
-    @Autowired
     private TokenService tokenService;
-    @Autowired
     private PessoaRepository pessoaRepository;
 
+    public SecurityFilter(TokenService tokenService, PessoaRepository pessoaRepository) {
+        this.tokenService = tokenService;
+        this.pessoaRepository = pessoaRepository;
+    }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

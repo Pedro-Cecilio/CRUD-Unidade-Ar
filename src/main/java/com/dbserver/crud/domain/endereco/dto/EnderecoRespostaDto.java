@@ -1,7 +1,6 @@
 package com.dbserver.crud.domain.endereco.dto;
 
 import com.dbserver.crud.domain.endereco.Endereco;
-import com.dbserver.crud.domain.pessoa.Pessoa;
 
 public record EnderecoRespostaDto(
 

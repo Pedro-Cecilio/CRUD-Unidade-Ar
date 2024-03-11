@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
 public class ErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> HandleErrorConstraintViolation(MethodArgumentNotValidException e) {
+    public ResponseEntity<Map<String, String>> handleErrorConstraintViolation(MethodArgumentNotValidException e) {
         BindingResult result = e.getBindingResult();
         Map<String, String> errors = new HashMap<>();
         for (FieldError error : result.getFieldErrors()) {

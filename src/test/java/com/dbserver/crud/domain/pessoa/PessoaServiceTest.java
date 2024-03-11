@@ -13,6 +13,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -75,6 +77,7 @@ class PessoaServiceTest {
                 assertEquals(dto.cpf(), resposta.getCpf());
                 assertEquals(dto.enderecos().size(), resposta.getEndereco().size());
         }
+
         @Test
         @DisplayName("Deve ser possível criar uma pessoa com mais de um endereço")
         void deveCriarPessoaComMaisDeUmEndereco() {
@@ -95,7 +98,6 @@ class PessoaServiceTest {
                 assertEquals(dto.cpf(), resposta.getCpf());
                 assertEquals(dto.enderecos().size(), resposta.getEndereco().size());
         }
-        
 
         @Test
         @DisplayName("Deve ser possível criar uma pessoa ao passar dados corretamente, sem passar endereço")
@@ -205,9 +207,15 @@ class PessoaServiceTest {
 
         }
 
-        @Test
-        @DisplayName("Deve falhar ao tentar atualizar senha com tamanho inválido")
-        void deveFalharAoAtualizarPessoaAoPassarSenhaComTamanhoInvalido() {
+        @ParameterizedTest
+        @DisplayName("Deve falhar ao tentar atualizar pessoa com dados inválidos: senha = {0}, cpf = {1}, nome = {2}")
+        @CsvSource({
+                        // nome, senha, cpf
+                        "null, 1234, null",
+                        "null, null, 1234567891a",
+                        "eu, null, null"
+        })
+        void deveFalharAoAtualizarPessoaComDadosInvalidos(String senha, String cpf, String nome) {
                 List<CriarEnderecoDto> enderecos = List.of(new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
                                 "Belo Horizonte", "Ribeiro de Abreu", "31872140", true));
                 CriarPessoaDto criarPessoaDto = new CriarPessoaDto("temtr", "123456", "Pedro",
@@ -215,42 +223,7 @@ class PessoaServiceTest {
                                 "12345678910",
                                 enderecos);
                 Pessoa pessoa = new Pessoa(criarPessoaDto, this.passwordEncoder);
-                AtualizarDadosPessoaDto novosDados = new AtualizarDadosPessoaDto(null, "1234", null,
-                                null);
-
-                assertThrows(IllegalArgumentException.class,
-                                () -> this.pessoaService.atualizarDadosPessoa(novosDados, pessoa));
-        }
-
-        @Test
-        @DisplayName("Deve falhar ao tentar atualizar cpf com formato inválido")
-        void deveFalharAoAtualizarPessoaAoPassarCpfComFormatoInvalido() {
-                List<CriarEnderecoDto> enderecos = List.of(new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
-                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", true));
-                CriarPessoaDto criarPessoaDto = new CriarPessoaDto("temtr", "123456", "Pedro",
-                                LocalDate.of(2000, 12, 15),
-                                "12345678910",
-                                enderecos);
-                Pessoa pessoa = new Pessoa(criarPessoaDto, this.passwordEncoder);
-                AtualizarDadosPessoaDto novosDados = new AtualizarDadosPessoaDto(null, null, null,
-                                "1234567891a");
-
-                assertThrows(IllegalArgumentException.class,
-                                () -> this.pessoaService.atualizarDadosPessoa(novosDados, pessoa));
-        }
-
-        @Test
-        @DisplayName("Deve falhar ao tentar atualizar nome com tamanho inválido")
-        void deveFalharAoAtualizarPessoaAoPassarNomeComTamanhoInvalido() {
-                List<CriarEnderecoDto> enderecos = List.of(new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
-                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", true));
-                CriarPessoaDto criarPessoaDto = new CriarPessoaDto("temtr", "123456", "Pedro",
-                                LocalDate.of(2000, 12, 15),
-                                "12345678910",
-                                enderecos);
-                Pessoa pessoa = new Pessoa(criarPessoaDto, this.passwordEncoder);
-                AtualizarDadosPessoaDto novosDados = new AtualizarDadosPessoaDto("eu", null, null,
-                                null);
+                AtualizarDadosPessoaDto novosDados = new AtualizarDadosPessoaDto(nome, senha, null,  cpf);
 
                 assertThrows(IllegalArgumentException.class,
                                 () -> this.pessoaService.atualizarDadosPessoa(novosDados, pessoa));

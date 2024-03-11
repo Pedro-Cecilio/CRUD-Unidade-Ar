@@ -8,7 +8,6 @@ import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.PessoaRespostaDto;
 import jakarta.validation.Valid;
-import java.nio.file.AccessDeniedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
