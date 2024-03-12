@@ -23,8 +23,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.dbserver.crud.domain.endereco.Endereco;
 import com.dbserver.crud.domain.endereco.EnderecoRepository;
+import com.dbserver.crud.domain.endereco.EnderecoService;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
-import com.dbserver.crud.domain.endereco.dto.EnderecoService;
 import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
 import com.dbserver.crud.infra.security.TokenService;
@@ -211,11 +211,11 @@ class PessoaServiceTest {
         @DisplayName("Deve falhar ao tentar atualizar pessoa com dados inválidos: senha = {0}, cpf = {1}, nome = {2}")
         @CsvSource({
                         // nome, senha, cpf
-                        "null, 1234, null",
-                        "null, null, 1234567891a",
-                        "eu, null, null"
+                        " , 1234, ",
+                        " ,  , 1234567891a",
+                        "eu,  ,  "
         })
-        void deveFalharAoAtualizarPessoaComDadosInvalidos(String senha, String cpf, String nome) {
+        void deveFalharAoAtualizarPessoaComDadosInvalidos(String nome, String senha, String cpf) {
                 List<CriarEnderecoDto> enderecos = List.of(new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
                                 "Belo Horizonte", "Ribeiro de Abreu", "31872140", true));
                 CriarPessoaDto criarPessoaDto = new CriarPessoaDto("temtr", "123456", "Pedro",

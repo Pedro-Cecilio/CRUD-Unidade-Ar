@@ -60,6 +60,16 @@ public class Pessoa implements UserDetails {
 
     }
 
+    public Pessoa(Long id, String login, String senha, String nome, LocalDate dataNascimento, String cpf,
+            PasswordEncoder passwordEnconder) {
+        this.id = id;
+        setLogin(login);
+        setSenha(senha, passwordEnconder);
+        setNome(nome);
+        setDataNascimento(dataNascimento);
+        setCpf(cpf);
+    }
+
     public Pessoa(CriarPessoaDto novaPessoa, PasswordEncoder passwordEnconder) {
         setLogin(novaPessoa.login());
         setSenha(novaPessoa.senha(), passwordEnconder);
@@ -103,6 +113,7 @@ public class Pessoa implements UserDetails {
         }
         this.dataNascimento = data;
     }
+
     public void setNome(String nome) {
         if (nome == null)
             throw new IllegalArgumentException("Nome deve ser informada");
@@ -113,7 +124,7 @@ public class Pessoa implements UserDetails {
 
     public void setCpf(String cpf) {
         if (cpf == null)
-            throw new IllegalArgumentException("Cpf deve ser informada");
+            throw new IllegalArgumentException("Cpf deve ser informado");
         if (!validarRegex(Utils.REGEX_CPF, cpf))
             throw new IllegalArgumentException("Cpf deve ter 11 caracteres numéricos");
         this.cpf = cpf;

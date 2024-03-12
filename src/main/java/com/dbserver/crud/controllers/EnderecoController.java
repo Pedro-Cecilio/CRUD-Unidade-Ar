@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.NoSuchElementException;
+import com.dbserver.crud.domain.endereco.EnderecoService;
 import com.dbserver.crud.domain.endereco.dto.AtualizarEnderecoDto;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.endereco.dto.EnderecoRespostaDto;
-import com.dbserver.crud.domain.endereco.dto.EnderecoService;
 import com.dbserver.crud.domain.pessoa.Pessoa;
 import com.dbserver.crud.domain.pessoa.PessoaService;
 

@@ -1,6 +1,5 @@
 package com.dbserver.crud.domain.autenticacao;
 
-import java.io.Serializable;
 
 import lombok.Getter;
 

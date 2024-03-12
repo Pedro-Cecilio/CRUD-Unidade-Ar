@@ -9,11 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.dbserver.crud.domain.endereco.Endereco;
 import com.dbserver.crud.domain.endereco.EnderecoRepository;
+import com.dbserver.crud.domain.endereco.EnderecoService;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
-import com.dbserver.crud.domain.endereco.dto.EnderecoService;
 import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
-import com.dbserver.crud.domain.pessoa.dto.PessoaRespostaDto;
 
 @Service
 public class PessoaService {
@@ -49,10 +48,6 @@ public class PessoaService {
         this.pessoaRepository.save(pessoa);
         return pessoa;
 
-    }
-
-    public PessoaRespostaDto criarPessoaRespostaDto(Pessoa pessoa) {
-        return new PessoaRespostaDto(pessoa);
     }
 
     public Pessoa atualizarDadosPessoa(AtualizarDadosPessoaDto atualizarDadosPessoaDto, Pessoa pessoa) {

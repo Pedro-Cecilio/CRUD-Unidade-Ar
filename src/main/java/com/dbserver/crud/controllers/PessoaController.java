@@ -27,7 +27,7 @@ public class PessoaController {
     @PostMapping("/novo")
     public ResponseEntity<PessoaRespostaDto> criarPessoa(@RequestBody @Valid CriarPessoaDto criarPessoaDto) {
         Pessoa pessoa = this.pessoaService.salvarPessoa(criarPessoaDto);
-        PessoaRespostaDto resposta = this.pessoaService.criarPessoaRespostaDto(pessoa);
+        PessoaRespostaDto resposta = new PessoaRespostaDto(pessoa);
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
@@ -35,7 +35,7 @@ public class PessoaController {
     public ResponseEntity<PessoaRespostaDto> atualizarPessoa(@RequestBody @Valid AtualizarDadosPessoaDto atualizarPessoaDto){
         Pessoa pessoa = this.pessoaService.pegarPessoaLogada();
         this.pessoaService.atualizarDadosPessoa(atualizarPessoaDto, pessoa);
-        PessoaRespostaDto resposta = this.pessoaService.criarPessoaRespostaDto(pessoa);
+        PessoaRespostaDto resposta = new PessoaRespostaDto(pessoa);
 
         return ResponseEntity.status(HttpStatus.OK).body(resposta);
     }

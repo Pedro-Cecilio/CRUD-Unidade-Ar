@@ -1,11 +1,12 @@
-package com.dbserver.crud.domain.endereco.dto;
+package com.dbserver.crud.domain.endereco;
 
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
-import com.dbserver.crud.domain.endereco.Endereco;
-import com.dbserver.crud.domain.endereco.EnderecoRepository;
+import com.dbserver.crud.domain.endereco.dto.AtualizarEnderecoDto;
+import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
+import com.dbserver.crud.domain.endereco.dto.EnderecoRespostaDto;
 import com.dbserver.crud.domain.pessoa.Pessoa;
 import java.util.NoSuchElementException;
 
@@ -18,13 +19,10 @@ public class EnderecoService {
     }
 
     public Endereco definirComoEnderecoPrincipal(Long pessoaId, Endereco endereco) {
-        Optional<Endereco> enderecoPrincipal = this.enderecoRepository.findByPessoaIdAndPrincipal(pessoaId, true);
-        if(enderecoPrincipal.isPresent() && !enderecoPrincipal.get().getId().equals(endereco.getId()) ){
-            enderecoPrincipal.get().setPrincipal(false);
-            this.enderecoRepository.save(enderecoPrincipal.get());
-            endereco.setPrincipal(true);
-            this.enderecoRepository.save(endereco);
-            return endereco;
+        Optional<Endereco> enderecoPrincipalTrue = this.enderecoRepository.findByPessoaIdAndPrincipal(pessoaId, true);
+        if(enderecoPrincipalTrue.isPresent() && !enderecoPrincipalTrue.get().getId().equals(endereco.getId()) ){
+            enderecoPrincipalTrue.get().setPrincipal(false);
+            this.enderecoRepository.save(enderecoPrincipalTrue.get());
         }
         endereco.setPrincipal(true);
         this.enderecoRepository.save(endereco);
@@ -49,12 +47,14 @@ public class EnderecoService {
         }
         Endereco enderecoValido = endereco.get();
         enderecoValido.atualizarDados(novosDados);
-        if(novosDados.principal().equals(true) && !novosDados.principal().equals(enderecoValido.getPrincipal())) {
+        if(novosDados.principal().booleanValue() && !novosDados.principal().equals(enderecoValido.getPrincipal())) {
             this.definirComoEnderecoPrincipal(pessoa.getId(), enderecoValido);
+            return new EnderecoRespostaDto(enderecoValido);
         }
-        if(novosDados.principal().equals(false) && !novosDados.principal().equals(enderecoValido.getPrincipal())) {
+        if(!novosDados.principal().booleanValue() && !novosDados.principal().equals(enderecoValido.getPrincipal())) {
             enderecoValido.setPrincipal(false);
         }
+        this.enderecoRepository.save(enderecoValido);
         return new EnderecoRespostaDto(enderecoValido);
     }
 }

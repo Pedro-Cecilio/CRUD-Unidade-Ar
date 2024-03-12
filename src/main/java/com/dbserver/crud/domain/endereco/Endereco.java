@@ -54,23 +54,35 @@ public class Endereco {
     protected Endereco() {
     }
 
+    public Endereco(Long id, String rua, String numero, String bairro, String cidade, String estado, String cep,
+            Boolean principal, Pessoa pessoa) {
+        this.id = id;
+        setRua(rua);
+        setNumero(numero);
+        setBairro(bairro);
+        setCidade(cidade);
+        setEstado(estado);
+        setCep(cep);
+        setPrincipal(principal);
+        setPessoa(pessoa);
+    }
+
     public Endereco(CriarEnderecoDto endereco) {
-        this.rua = endereco.rua();
-        this.numero = endereco.numero();
-        this.bairro = endereco.bairro();
-        this.cidade = endereco.cidade();
-        this.estado = endereco.estado();
-        this.cep = endereco.cep();
-        setPrincipal(endereco.principal());
+        setRua(endereco.rua());
+        setNumero(endereco.numero());
+        setBairro(endereco.bairro());
+        setCidade(endereco.cidade());
+        setEstado(endereco.estado());
+        setCep(endereco.cep());
     }
 
     public void atualizarDados(AtualizarEnderecoDto dados) {
-        this.rua = dados.rua() != null && !dados.rua().isEmpty() ? dados.rua() : this.rua;
-        this.numero = dados.numero() != null && !dados.numero().isEmpty() ? dados.numero() : this.numero;
-        this.bairro = dados.bairro() != null && !dados.bairro().isEmpty() ? dados.bairro() : this.bairro;
-        this.cidade = dados.cidade() != null && !dados.cidade().isEmpty() ? dados.cidade() : this.cidade;
-        this.estado = dados.estado() != null && !dados.estado().isEmpty() ? dados.estado() : this.estado;
-        this.cep = dados.cep() != null && !dados.cep().isEmpty() ? dados.cep() : this.cep;
+        setRua(dados.rua());
+        setNumero(dados.numero());
+        setBairro(dados.bairro());
+        setCidade(dados.cidade());
+        setEstado(dados.estado());
+        setCep(dados.cep());
     }
 
     public void setPrincipal(Boolean principal) {
@@ -80,9 +92,10 @@ public class Endereco {
     }
 
     public void setPessoa(Pessoa pessoa) {
-        if (pessoa != null) {
-            this.pessoa = pessoa;
+        if (pessoa == null) {
+            throw new IllegalArgumentException("Pessoa não pode ser nula");
         }
+        this.pessoa = pessoa;
     }
 
     public void setNumero(String numero) {
@@ -98,6 +111,35 @@ public class Endereco {
             throw new IllegalArgumentException("Cep deve ser informado");
         if (!validarRegex(Utils.REGEX_CEP, cep))
             throw new IllegalArgumentException("Número deve ter 8 caracteres numéricos");
+        this.cep = cep;
+    }
+
+    public void setRua(String rua) {
+        if (rua == null || rua.isEmpty()) {
+            throw new IllegalArgumentException("Rua não pode ser nula ou vazia");
+        }
+        this.rua = rua;
+    }
+
+    public void setBairro(String bairro) {
+        if (bairro == null || bairro.isEmpty()) {
+            throw new IllegalArgumentException("Bairro não pode ser nulo ou vazio");
+        }
+        this.bairro = bairro;
+    }
+
+    public void setCidade(String cidade) {
+        if (cidade == null || cidade.isEmpty()) {
+            throw new IllegalArgumentException("Cidade não pode ser nula ou vazia");
+        }
+        this.cidade = cidade;
+    }
+
+    public void setEstado(String estado) {
+        if (estado == null || estado.isEmpty()) {
+            throw new IllegalArgumentException("Estado não pode ser nulo ou vazio");
+        }
+        this.estado = estado;
     }
 
 }
