@@ -26,7 +26,7 @@ public class ErrorHandler {
         Map<String, String> errors = new HashMap<>();
         for (FieldError error : result.getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
-        }        
+        }
         return ResponseEntity.badRequest().body(errors);
     }
 
@@ -34,6 +34,7 @@ public class ErrorHandler {
     public ResponseEntity<ResponseError<String>> handleErrorBadCredentials(BadCredentialsException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseError<String>(e.getMessage()));
     }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ResponseError<String>> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseError<String>(e.getMessage()));
@@ -48,14 +49,17 @@ public class ErrorHandler {
     public ResponseEntity<ResponseError<String>> handleErrorAccessDenied(AccessDeniedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseError<String>(e.getMessage()));
     }
+
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ResponseError<String>> handleNoSuchElementException(NoSuchElementException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseError<String>(e.getMessage()));
     }
+
     @ExceptionHandler(PSQLException.class)
     public ResponseEntity<ResponseError<String>> handlePSQLExceptionn(PSQLException e) {
         List<String> mensagemDeErro = Arrays.asList(e.getMessage().split("Detalhe:"));
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseError<String>(mensagemDeErro.get(1).trim()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseError<String>(mensagemDeErro.get(1).trim()));
     }
 
 }

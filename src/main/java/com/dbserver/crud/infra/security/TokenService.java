@@ -3,6 +3,8 @@ package com.dbserver.crud.infra.security;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -13,12 +15,13 @@ import com.dbserver.crud.domain.pessoa.Pessoa;
 @Service
 public class TokenService {
     
-    private String secret = "senha";
+    @Value("${api.security.token.senha}")
+    private String senha;
 
     public String gerarToken(Pessoa pessoa) {
 
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(senha);
             return JWT.create()
                     .withIssuer("CRUD Unidade Ar")
                     .withSubject(pessoa.getLogin())
@@ -34,7 +37,7 @@ public class TokenService {
 
     public String validarToken(String token) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(senha);
             return JWT.require(algorithm)
                     .withIssuer("CRUD Unidade Ar")
                     .build()

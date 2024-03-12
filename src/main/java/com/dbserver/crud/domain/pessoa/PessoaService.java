@@ -3,6 +3,8 @@ package com.dbserver.crud.domain.pessoa;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +15,7 @@ import com.dbserver.crud.domain.endereco.EnderecoService;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
+import com.dbserver.crud.domain.pessoa.dto.PessoaRespostaDto;
 
 @Service
 public class PessoaService {
@@ -33,13 +36,13 @@ public class PessoaService {
         Pessoa pessoa = new Pessoa(criarPessoaDTO, this.passwordEnconder);
         List<CriarEnderecoDto> enderecos = criarPessoaDTO.enderecos();
         this.pessoaRepository.save(pessoa);
-        if(enderecos != null && !enderecos.isEmpty()) {
-            enderecos.forEach(endereco ->{
+        if (enderecos != null && !enderecos.isEmpty()) {
+            enderecos.forEach(endereco -> {
                 Endereco novoEndereco = new Endereco(endereco);
                 novoEndereco.setPessoa(pessoa);
-                if(novoEndereco.getPrincipal().equals(true)){
+                if (endereco.principal().booleanValue()) {
                     this.enderecoService.definirComoEnderecoPrincipal(pessoa.getId(), novoEndereco);
-                }else{
+                } else {
                     this.enderecoRepository.save(novoEndereco);
                 }
                 pessoa.setEndereco(novoEndereco);
@@ -55,6 +58,11 @@ public class PessoaService {
         return this.pessoaRepository.save(pessoa);
     }
 
+    public List<PessoaRespostaDto> pegarTodasPessoas(Pageable pageable) {
+        Page<Pessoa> pessoas = this.pessoaRepository.findAll(pageable);
+        return pessoas.stream().map(PessoaRespostaDto::new).toList();
+    }
+
     public Pessoa pegarPessoaLogada() {
         Optional<Pessoa> pessoa = this.pessoaRepository.findById(this.pegarIdDaPessoaLogada());
         if (pessoa.isPresent()) {
@@ -66,6 +74,6 @@ public class PessoaService {
     public Long pegarIdDaPessoaLogada() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Pessoa pessoaLogada = (Pessoa) authentication.getPrincipal();
-        return  pessoaLogada.getId();
+        return pessoaLogada.getId();
     }
 }

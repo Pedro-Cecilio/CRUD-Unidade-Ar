@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +42,8 @@ class EnderecoServiceTest {
 
     @Mock
     private Endereco enderecoMock;
+    @Mock
+    private Endereco enderecoMock2;
 
     @Mock
     private Pessoa pessoaMock;
@@ -54,8 +57,8 @@ class EnderecoServiceTest {
     private PasswordEncoder passwordEnconder;
 
     @Test
-    @DisplayName("Deve ser possível definir um endereço como principal")
-    void deveSerPossivelDefinirUmEnderecoComoPrincipal() {
+    @DisplayName("Deve ser possível definir um endereço como principal quando for o primeiro endereço principal de pessoa")
+    void deveSerPossivelDefinirUmEnderecoComoPrincipalQuandoForOPrimeiroPrincipal() {
         
         this.pessoaMock = new Pessoa(1L, "usuario123", "senha123", "João", LocalDate.of(1990, 5, 15), "12345678910",
                 this.passwordEnconder);
@@ -64,6 +67,21 @@ class EnderecoServiceTest {
         when(this.enderecoRepository.findByPessoaIdAndPrincipal(anyLong(), eq(true))).thenReturn(Optional.empty());
         Endereco endereco = this.enderecoService.definirComoEnderecoPrincipal(1L, enderecoMock);
         verify(this.enderecoRepository).save(endereco);
+        assertEquals(true, endereco.getPrincipal());
+    }
+    @Test
+    @DisplayName("Deve ser possível definir um endereço como principal quando não for o primeiro endereço principal de pessoa")
+    void deveSerPossivelDefinirUmEnderecoComoPrincipalQuandoNaoForOPrimeiroPrincipal() {
+        
+        this.pessoaMock = new Pessoa(1L, "usuario123", "senha123", "João", LocalDate.of(1990, 5, 15), "12345678910",
+                this.passwordEnconder);
+        this.enderecoMock = new Endereco(2L, "Rua das Flores", "123", "Centro", "São Paulo", "SP", "12345678", false, this.pessoaMock);
+        this.enderecoMock2 = new Endereco(1L, "Rua das Rosas", "123", "Centro", "São Paulo", "SP", "12345678", true, this.pessoaMock);
+
+        when(this.enderecoRepository.findByPessoaIdAndPrincipal(anyLong(), eq(true))).thenReturn(Optional.of(enderecoMock2));
+        Endereco endereco = this.enderecoService.definirComoEnderecoPrincipal(2L, enderecoMock);
+        verify(this.enderecoRepository).save(endereco);
+        verify(this.enderecoRepository, times(2)).save(any(Endereco.class));
         assertEquals(true, endereco.getPrincipal());
     }
 

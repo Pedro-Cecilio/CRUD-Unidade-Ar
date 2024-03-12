@@ -3,6 +3,7 @@ package com.dbserver.crud.domain.endereco.dto;
 import com.dbserver.crud.utils.Utils;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record CriarEnderecoDto(
@@ -26,6 +27,7 @@ public record CriarEnderecoDto(
     @NotBlank
     String cep,
 
+    @NotNull
     Boolean principal
 ) {}
 

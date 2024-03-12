@@ -223,7 +223,7 @@ class PessoaServiceTest {
                                 "12345678910",
                                 enderecos);
                 Pessoa pessoa = new Pessoa(criarPessoaDto, this.passwordEncoder);
-                AtualizarDadosPessoaDto novosDados = new AtualizarDadosPessoaDto(nome, senha, null,  cpf);
+                AtualizarDadosPessoaDto novosDados = new AtualizarDadosPessoaDto(nome, senha, null, cpf);
 
                 assertThrows(IllegalArgumentException.class,
                                 () -> this.pessoaService.atualizarDadosPessoa(novosDados, pessoa));

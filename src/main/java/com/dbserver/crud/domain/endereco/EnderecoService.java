@@ -1,6 +1,5 @@
 package com.dbserver.crud.domain.endereco;
 
-
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,7 @@ public class EnderecoService {
 
     public Endereco definirComoEnderecoPrincipal(Long pessoaId, Endereco endereco) {
         Optional<Endereco> enderecoPrincipalTrue = this.enderecoRepository.findByPessoaIdAndPrincipal(pessoaId, true);
-        if(enderecoPrincipalTrue.isPresent() && !enderecoPrincipalTrue.get().getId().equals(endereco.getId()) ){
+        if (enderecoPrincipalTrue.isPresent() && !enderecoPrincipalTrue.get().getId().equals(endereco.getId())) {
             enderecoPrincipalTrue.get().setPrincipal(false);
             this.enderecoRepository.save(enderecoPrincipalTrue.get());
         }
@@ -29,29 +28,29 @@ public class EnderecoService {
         return endereco;
     }
 
-    public EnderecoRespostaDto criarNovoEndereco(CriarEnderecoDto criarEnderecoDto, Pessoa pessoa){
+    public EnderecoRespostaDto criarNovoEndereco(CriarEnderecoDto criarEnderecoDto, Pessoa pessoa) {
         Endereco novoEndereco = new Endereco(criarEnderecoDto);
         novoEndereco.setPessoa(pessoa);
-        if(novoEndereco.getPrincipal().equals(true)){
+        if (novoEndereco.getPrincipal().equals(true)) {
             this.definirComoEnderecoPrincipal(pessoa.getId(), novoEndereco);
-        }else{
+        } else {
             this.enderecoRepository.save(novoEndereco);
-        }      
+        }
         return new EnderecoRespostaDto(novoEndereco);
     }
-    
-    public EnderecoRespostaDto atualizarEndereco(AtualizarEnderecoDto novosDados, Long enderecoId, Pessoa pessoa){
+
+    public EnderecoRespostaDto atualizarEndereco(AtualizarEnderecoDto novosDados, Long enderecoId, Pessoa pessoa) {
         Optional<Endereco> endereco = this.enderecoRepository.findByIdAndPessoaId(enderecoId, pessoa.getId());
-        if(endereco.isEmpty()){
+        if (endereco.isEmpty()) {
             throw new NoSuchElementException("Endereço não encontrado.");
         }
         Endereco enderecoValido = endereco.get();
         enderecoValido.atualizarDados(novosDados);
-        if(novosDados.principal().booleanValue() && !novosDados.principal().equals(enderecoValido.getPrincipal())) {
+        if (novosDados.principal().booleanValue() && !novosDados.principal().equals(enderecoValido.getPrincipal())) {
             this.definirComoEnderecoPrincipal(pessoa.getId(), enderecoValido);
             return new EnderecoRespostaDto(enderecoValido);
         }
-        if(!novosDados.principal().booleanValue() && !novosDados.principal().equals(enderecoValido.getPrincipal())) {
+        if (!novosDados.principal().booleanValue() && !novosDados.principal().equals(enderecoValido.getPrincipal())) {
             enderecoValido.setPrincipal(false);
         }
         this.enderecoRepository.save(enderecoValido);

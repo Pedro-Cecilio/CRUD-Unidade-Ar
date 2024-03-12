@@ -62,7 +62,7 @@ class PessoaControllerTest {
     @DisplayName("Deve retornar Status 201 ao criar pessoa com endereço")
     @WithMockUser
     void deveCriarPessoaComEndereco() throws Exception {
-        CriarEnderecoDto novoEndereco = new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu", "Belo Horizonte", "Minas Gerais", "31872140", null);
+        CriarEnderecoDto novoEndereco = new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu", "Belo Horizonte", "Minas Gerais", "31872140", true);
         CriarPessoaDto novaPessoa = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15), "12345678911", List.of(novoEndereco));
 
         MockHttpServletResponse resposta = mockMvc.perform(MockMvcRequestBuilders
