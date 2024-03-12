@@ -16,10 +16,12 @@ import com.dbserver.crud.domain.endereco.dto.EnderecoRespostaDto;
 import com.dbserver.crud.domain.pessoa.Pessoa;
 import com.dbserver.crud.domain.pessoa.PessoaService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/endereco")
+@SecurityRequirement(name = "bearer-key")
 public class EnderecoController {
     private EnderecoService enderecoService;
     private PessoaService pessoaService;
@@ -48,6 +50,7 @@ public class EnderecoController {
         } catch (NumberFormatException e) {
             throw new NoSuchElementException("Endereço não encontrado.");
         }
-
     }
+
+
 }

@@ -1,6 +1,9 @@
 package com.dbserver.crud.domain.pessoa.dto;
 
 import java.time.LocalDate;
+
+import com.dbserver.crud.utils.Utils;
+
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -12,7 +15,7 @@ public record AtualizarDadosPessoaDto(
 
         LocalDate dataNascimento,
 
-        @Pattern(regexp = "^\\d{11}+$", message = "O cpf deve conter 11 caracteres numéricos" )
+        @Pattern(regexp = Utils.REGEX_CPF, message = "O cpf deve conter 11 caracteres numéricos" )
         String cpf
 
         ) {

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.infra.jsonDeserializer.LocalDateDeserializer;
+import com.dbserver.crud.utils.Utils;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.validation.constraints.NotBlank;
@@ -27,7 +28,7 @@ public record CriarPessoaDto(
         LocalDate dataNascimento,
 
         @NotBlank
-        @Pattern(regexp = "^\\d{11}+$", message = "O cpf deve conter 11 caracteres numéricos" )
+        @Pattern(regexp = Utils.REGEX_CPF, message = "O cpf deve conter 11 caracteres numéricos" )
         String cpf,
 
         List<CriarEnderecoDto> enderecos

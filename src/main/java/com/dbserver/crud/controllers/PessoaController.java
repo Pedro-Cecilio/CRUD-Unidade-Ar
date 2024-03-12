@@ -7,6 +7,8 @@ import com.dbserver.crud.domain.pessoa.PessoaService;
 import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.PessoaRespostaDto;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,7 @@ public class PessoaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
+    @SecurityRequirement(name = "bearer-key")
     @PutMapping("/atualizar")
     public ResponseEntity<PessoaRespostaDto> atualizarPessoa(@RequestBody @Valid AtualizarDadosPessoaDto atualizarPessoaDto){
         Pessoa pessoa = this.pessoaService.pegarPessoaLogada();
