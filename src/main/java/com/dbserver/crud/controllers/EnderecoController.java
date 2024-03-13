@@ -1,13 +1,17 @@
 package com.dbserver.crud.controllers;
 
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 import java.util.NoSuchElementException;
 import com.dbserver.crud.domain.endereco.EnderecoService;
 import com.dbserver.crud.domain.endereco.dto.AtualizarEnderecoDto;
@@ -52,5 +56,11 @@ public class EnderecoController {
         }
     }
 
+    @SecurityRequirement(name = "bearer-key")
+    @GetMapping
+    public ResponseEntity<List<EnderecoRespostaDto>> pegarTodosEnderecos(@ParameterObject Pageable pageable) {
+        List<EnderecoRespostaDto> pessoas = this.enderecoService.pegarTodosEnderecos(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(pessoas);
+    }
 
 }

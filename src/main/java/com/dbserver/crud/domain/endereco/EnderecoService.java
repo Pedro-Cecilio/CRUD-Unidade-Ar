@@ -1,12 +1,14 @@
 package com.dbserver.crud.domain.endereco;
 
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import com.dbserver.crud.domain.endereco.dto.AtualizarEnderecoDto;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.endereco.dto.EnderecoRespostaDto;
 import com.dbserver.crud.domain.pessoa.Pessoa;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -55,5 +57,10 @@ public class EnderecoService {
         }
         this.enderecoRepository.save(enderecoValido);
         return new EnderecoRespostaDto(enderecoValido);
+    }
+
+    public List<EnderecoRespostaDto> pegarTodosEnderecos(Pageable pageable) {
+        Page<Endereco> enderecos = this.enderecoRepository.findAll(pageable);
+        return enderecos.stream().map(EnderecoRespostaDto::new).toList();
     }
 }

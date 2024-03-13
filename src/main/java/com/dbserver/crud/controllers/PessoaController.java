@@ -48,8 +48,8 @@ public class PessoaController {
     }
 
     @SecurityRequirement(name = "bearer-key")
-    @GetMapping("/todas")
-    public ResponseEntity<List<PessoaRespostaDto>> getMethodName(@ParameterObject Pageable pageable) {
+    @GetMapping
+    public ResponseEntity<List<PessoaRespostaDto>> pegarTodasPessoas(@ParameterObject Pageable pageable) {
         List<PessoaRespostaDto> pessoas = this.pessoaService.pegarTodasPessoas(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(pessoas);
     }
