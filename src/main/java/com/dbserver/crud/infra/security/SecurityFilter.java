@@ -40,16 +40,17 @@ public class SecurityFilter extends OncePerRequestFilter {
                     var authentication = new UsernamePasswordAuthenticationToken(user.get(), null,
                             user.get().getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    filterChain.doFilter(request, response);
                 } else {
                     this.respostaErro(response);
                     return;
                 }
             } catch (ValidarJwtExeption e) {
                 this.respostaErro(response);
+                return;
             }
         }
-        this.respostaErro(response);
+        filterChain.doFilter(request, response);
+
     }
 
     private String recuperarToken(HttpServletRequest request) {
