@@ -20,13 +20,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.dbserver.crud.domain.endereco.Endereco;
 import com.dbserver.crud.domain.endereco.EnderecoRepository;
 import com.dbserver.crud.domain.endereco.EnderecoService;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
+import com.dbserver.crud.domain.endereco.dto.EnderecoRespostaDto;
 import com.dbserver.crud.domain.pessoa.dto.AtualizarDadosPessoaDto;
 import com.dbserver.crud.domain.pessoa.dto.CriarPessoaDto;
+import com.dbserver.crud.domain.pessoa.dto.PessoaRespostaDto;
 import com.dbserver.crud.infra.security.TokenService;
 import com.dbserver.crud.domain.autenticacao.AutenticacaoService;
 
@@ -52,13 +58,21 @@ class PessoaServiceTest {
         private AutenticacaoService autenticacaoService;
 
         @Mock
+        private Pageable pageable;
+        @Mock
         private Endereco enderecoMock;
         @Mock
         private Pessoa pessoaMock;
         @Mock
+        private Pessoa pessoaMock2;
+
+        @Mock
         private EnderecoService enderecoService;
         @Mock
         private EnderecoRepository enderecoRepository;
+
+        @Autowired
+        private PasswordEncoder passwordEnconder;
 
         // Método Criar Pessoa
         @Test
@@ -227,6 +241,55 @@ class PessoaServiceTest {
 
                 assertThrows(IllegalArgumentException.class,
                                 () -> this.pessoaService.atualizarDadosPessoa(novosDados, pessoa));
+        }
+
+        @Test
+        @DisplayName("Deve buscar todas pessoas")
+        void deveBuscarTodasPessoas() {
+                this.pessoaMock = new Pessoa(1L, "usuario123", "senha123", "João", LocalDate.of(1990, 5, 15),
+                                "12345678910",
+                                this.passwordEnconder);
+                this.pessoaMock2 = new Pessoa(2L, "user456", "senha456", "Maria", LocalDate.of(1988, 9, 20),
+                                "98765432109", this.passwordEncoder);
+
+                List<Pessoa> pessoas = List.of(pessoaMock, pessoaMock2);
+                Page<Pessoa> pagePessoas = new PageImpl<>(pessoas);
+
+                when(this.pessoaRepository.findAll(pageable)).thenReturn(pagePessoas);
+
+                List<PessoaRespostaDto> resposta = this.pessoaService.pegarTodasPessoas(pageable);
+
+                // Assertivas para o primeiro objeto Pessoa
+                assertEquals(pessoaMock.getId(), resposta.get(0).id());
+                assertEquals(pessoaMock.getLogin(), resposta.get(0).login());
+                assertEquals(pessoaMock.getNome(), resposta.get(0).nome());
+                assertEquals(pessoaMock.getDataNascimento(), resposta.get(0).dataNascimento());
+                assertEquals(pessoaMock.getCpf(), resposta.get(0).cpf());
+
+                // Assertivas para o segundo objeto Pessoa, se necessário
+                assertEquals(pessoaMock2.getId(), resposta.get(1).id());
+                assertEquals(pessoaMock2.getLogin(), resposta.get(1).login());
+                assertEquals(pessoaMock2.getNome(), resposta.get(1).nome());
+                assertEquals(pessoaMock2.getDataNascimento(), resposta.get(1).dataNascimento());
+                assertEquals(pessoaMock2.getCpf(), resposta.get(1).cpf());
+
+                assertEquals(pessoas.size(), resposta.size());
+
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia ao buscar todos endereços quando não houver endereço cadastrado")
+        void deveRetornarListaVaziaAoBuscarTodosEnderecos() {
+
+                List<Pessoa> pessoas = List.of(pessoaMock, pessoaMock2);
+                Page<Pessoa> pagePessoas = new PageImpl<>(pessoas);
+
+                when(this.pessoaRepository.findAll(pageable)).thenReturn(pagePessoas);
+
+                List<PessoaRespostaDto> resposta = this.pessoaService.pegarTodasPessoas(pageable);
+
+                assertEquals(pessoas.size(), resposta.size());
+
         }
 
 }
