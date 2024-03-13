@@ -55,7 +55,6 @@ class PessoaControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(criarPessoaJson.write(novaPessoa).getJson()))
                 .andReturn().getResponse();
-        System.out.println(resposta.getContentAsString());
         assertThat(resposta.getStatus()).isEqualTo(HttpStatus.CREATED.value());
     }
     @Test
@@ -70,7 +69,6 @@ class PessoaControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(criarPessoaJson.write(novaPessoa).getJson()))
                 .andReturn().getResponse();
-        System.out.println(resposta.getContentAsString());
         assertThat(resposta.getStatus()).isEqualTo(HttpStatus.CREATED.value());
     }
 }
