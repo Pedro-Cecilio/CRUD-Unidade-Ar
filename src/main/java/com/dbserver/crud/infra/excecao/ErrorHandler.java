@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.dbserver.crud.infra.excecao.novasExcecoes.CriarJwtExeption;
 import javax.naming.AuthenticationException;
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
@@ -60,6 +61,12 @@ public class ErrorHandler {
         List<String> mensagemDeErro = Arrays.asList(e.getMessage().split("Detalhe:"));
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseError<String>(mensagemDeErro.get(1).trim()));
+    }
+
+    @ExceptionHandler(CriarJwtExeption.class)
+    public ResponseEntity<ResponseError<String>> handleValidarJwtExeption(CriarJwtExeption e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ResponseError<String>(e.getMessage()));
     }
 
 }

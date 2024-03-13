@@ -1,6 +1,5 @@
 package com.dbserver.crud.infra.security;
 
-
 import java.io.IOException;
 import java.util.Optional;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,6 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.dbserver.crud.domain.pessoa.Pessoa;
 import com.dbserver.crud.domain.pessoa.PessoaRepository;
+import com.dbserver.crud.infra.excecao.ResponseError;
+import com.dbserver.crud.infra.excecao.novasExcecoes.ValidarJwtExeption;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,20 +25,31 @@ public class SecurityFilter extends OncePerRequestFilter {
         this.tokenService = tokenService;
         this.pessoaRepository = pessoaRepository;
     }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         var token = this.recuperarToken(request);
+        
         if (token != null) {
-            var login = tokenService.validarToken(token);
-            Optional<Pessoa> user = pessoaRepository.findByLogin(login);
+            try {
+                String login = tokenService.validarToken(token);
 
-            if (user.isPresent()) {
-                var authentication = new UsernamePasswordAuthenticationToken(user.get(), null, user.get().getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                Optional<Pessoa> user = pessoaRepository.findByLogin(login);
+                if (user.isPresent()) {
+                    var authentication = new UsernamePasswordAuthenticationToken(user.get(), null,
+                            user.get().getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    filterChain.doFilter(request, response);
+                } else {
+                    this.respostaErro(response);
+                    return;
+                }
+            } catch (ValidarJwtExeption e) {
+                this.respostaErro(response);
             }
         }
-        filterChain.doFilter(request, response);
+        this.respostaErro(response);
     }
 
     private String recuperarToken(HttpServletRequest request) {
@@ -46,4 +59,13 @@ public class SecurityFilter extends OncePerRequestFilter {
         return authHeader.replace("Bearer ", "");
     }
 
+    public void respostaErro(HttpServletResponse response) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ResponseError<String> responseError = new ResponseError<>("Token inválido");
+        String tokenErrorResponse = mapper.writeValueAsString(responseError);
+        
+        response.setStatus(401);
+        response.addHeader("Content-type", "application/json");
+        response.getWriter().write(tokenErrorResponse);
+    }
 }
