@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -52,6 +53,14 @@ public class PessoaController {
     public ResponseEntity<List<PessoaRespostaDto>> pegarTodasPessoas(@ParameterObject Pageable pageable) {
         List<PessoaRespostaDto> pessoas = this.pessoaService.pegarTodasPessoas(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(pessoas);
+    }
+
+    @SecurityRequirement(name = "bearer-key")
+    @DeleteMapping("/deletar")
+    public ResponseEntity<String> deletarPessoa() {
+        Pessoa pessoa = this.pessoaService.pegarPessoaLogada();
+        this.pessoaService.deletarPessoa(pessoa);
+        return ResponseEntity.status(HttpStatus.OK).body("Pessoa deletada com sucesso");
     }
 
 }

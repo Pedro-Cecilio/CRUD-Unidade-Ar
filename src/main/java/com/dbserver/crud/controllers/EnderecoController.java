@@ -4,6 +4,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +36,7 @@ public class EnderecoController {
         this.pessoaService = pessoaService;
     }
 
-    @PostMapping("/novo")
+    @PostMapping
     public ResponseEntity<EnderecoRespostaDto> cadastrarEndereco(
             @Valid @RequestBody CriarEnderecoDto criarEnderecoDto) {
         Pessoa pessoa = this.pessoaService.pegarPessoaLogada();
@@ -59,8 +60,23 @@ public class EnderecoController {
     @SecurityRequirement(name = "bearer-key")
     @GetMapping
     public ResponseEntity<List<EnderecoRespostaDto>> pegarTodosEnderecos(@ParameterObject Pageable pageable) {
-        List<EnderecoRespostaDto> pessoas = this.enderecoService.pegarTodosEnderecos(pageable);
+        Long pessoaId = this.pessoaService.pegarIdDaPessoaLogada();
+        List<EnderecoRespostaDto> pessoas = this.enderecoService.pegarTodosEnderecos(pageable, pessoaId);
         return ResponseEntity.status(HttpStatus.OK).body(pessoas);
+    }
+
+    @SecurityRequirement(name = "bearer-key")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarEndereco(@PathVariable("id") String id) {
+
+        try {
+            Long pessoaId = this.pessoaService.pegarIdDaPessoaLogada();
+            Long idLong = Long.parseLong(id);
+            this.enderecoService.deletarEndereco(idLong, pessoaId);
+            return ResponseEntity.status(HttpStatus.OK).body("Endereco deletado com sucesso");
+        } catch (NumberFormatException e) {
+            throw new NoSuchElementException("Endereço não encontrado.");
+        }
     }
 
 }

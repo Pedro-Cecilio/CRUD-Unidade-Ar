@@ -25,7 +25,8 @@ public class PessoaService {
     private EnderecoRepository enderecoRepository;
     private EnderecoService enderecoService;
 
-    public PessoaService(PessoaRepository pessoaRepository, PasswordEncoder passwordEnconder, EnderecoRepository enderecoRepository, EnderecoService enderecoService) {
+    public PessoaService(PessoaRepository pessoaRepository, PasswordEncoder passwordEnconder,
+            EnderecoRepository enderecoRepository, EnderecoService enderecoService) {
         this.pessoaRepository = pessoaRepository;
         this.passwordEnconder = passwordEnconder;
         this.enderecoRepository = enderecoRepository;
@@ -61,6 +62,10 @@ public class PessoaService {
     public List<PessoaRespostaDto> pegarTodasPessoas(Pageable pageable) {
         Page<Pessoa> pessoas = this.pessoaRepository.findAll(pageable);
         return pessoas.stream().map(PessoaRespostaDto::new).toList();
+    }
+
+    public void deletarPessoa(Pessoa pessoa) {
+        this.pessoaRepository.delete(pessoa);
     }
 
     public Pessoa pegarPessoaLogada() {

@@ -28,6 +28,7 @@ import com.dbserver.crud.domain.endereco.dto.AtualizarEnderecoDto;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.endereco.dto.EnderecoRespostaDto;
 import com.dbserver.crud.domain.pessoa.Pessoa;
+import com.dbserver.crud.domain.pessoa.PessoaService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -40,6 +41,8 @@ class EnderecoServiceTest {
 
         @InjectMocks
         private EnderecoService enderecoService;
+        @Mock 
+        private PessoaService pessoaService;
 
         @Mock
         private EnderecoRepository enderecoRepository;
@@ -229,9 +232,9 @@ class EnderecoServiceTest {
                 List<Endereco> enderecos = List.of(enderecoMock, enderecoMock2);
                 Page<Endereco> pageEnderecos = new PageImpl<>(enderecos);
 
-                when(this.enderecoRepository.findAll(pageable)).thenReturn(pageEnderecos);
+                when(this.enderecoRepository.findAllByPessoaId(pageable, 1L)).thenReturn(pageEnderecos);
 
-                List<EnderecoRespostaDto> resposta = this.enderecoService.pegarTodosEnderecos(pageable);
+                List<EnderecoRespostaDto> resposta = this.enderecoService.pegarTodosEnderecos(pageable, 1L);
 
                 assertEquals(enderecoMock.getId(), resposta.get(0).id());
                 assertEquals(enderecoMock.getRua(), resposta.get(0).rua());
@@ -261,9 +264,9 @@ class EnderecoServiceTest {
                 List<Endereco> enderecos = List.of();
                 Page<Endereco> pageEnderecos = new PageImpl<>(enderecos);
 
-                when(this.enderecoRepository.findAll(pageable)).thenReturn(pageEnderecos);
+                when(this.enderecoRepository.findAllByPessoaId(pageable, 1L)).thenReturn(pageEnderecos);
 
-                List<EnderecoRespostaDto> resposta = this.enderecoService.pegarTodosEnderecos(pageable);
+                List<EnderecoRespostaDto> resposta = this.enderecoService.pegarTodosEnderecos(pageable, 1L);
 
                 assertEquals(enderecos.size(), resposta.size());
 

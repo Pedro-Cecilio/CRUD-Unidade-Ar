@@ -59,8 +59,16 @@ public class EnderecoService {
         return new EnderecoRespostaDto(enderecoValido);
     }
 
-    public List<EnderecoRespostaDto> pegarTodosEnderecos(Pageable pageable) {
-        Page<Endereco> enderecos = this.enderecoRepository.findAll(pageable);
+    public List<EnderecoRespostaDto> pegarTodosEnderecos(Pageable pageable, Long pessoaId) {
+        Page<Endereco> enderecos = this.enderecoRepository.findAllByPessoaId(pageable, pessoaId);
         return enderecos.stream().map(EnderecoRespostaDto::new).toList();
+    }
+
+    public void deletarEndereco(Long idLong, Long pessoaId) {
+        Optional<Endereco> endereco = this.enderecoRepository.findByIdAndPessoaId(idLong, pessoaId);
+        if(endereco.isEmpty()){
+            throw new NoSuchElementException("Endereço não encontrado.");
+        }
+        this.enderecoRepository.delete(endereco.get());
     }
 }
