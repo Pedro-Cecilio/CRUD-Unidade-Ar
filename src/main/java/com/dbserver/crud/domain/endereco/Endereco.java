@@ -115,28 +115,28 @@ public class Endereco {
     }
 
     public void setRua(String rua) {
-        if (rua == null || rua.isEmpty()) {
+        if (rua == null || rua.trim().isEmpty()) {
             throw new IllegalArgumentException("Rua não pode ser nula ou vazia");
         }
         this.rua = rua;
     }
 
     public void setBairro(String bairro) {
-        if (bairro == null || bairro.isEmpty()) {
+        if (bairro == null || bairro.trim().isEmpty()) {
             throw new IllegalArgumentException("Bairro não pode ser nulo ou vazio");
         }
         this.bairro = bairro;
     }
 
     public void setCidade(String cidade) {
-        if (cidade == null || cidade.isEmpty()) {
+        if (cidade == null || cidade.trim().isEmpty()) {
             throw new IllegalArgumentException("Cidade não pode ser nula ou vazia");
         }
         this.cidade = cidade;
     }
 
     public void setEstado(String estado) {
-        if (estado == null || estado.isEmpty()) {
+        if (estado == null || estado.trim().isEmpty()) {
             throw new IllegalArgumentException("Estado não pode ser nulo ou vazio");
         }
         this.estado = estado;

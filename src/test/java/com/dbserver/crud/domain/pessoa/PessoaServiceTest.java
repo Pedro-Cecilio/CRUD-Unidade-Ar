@@ -1,20 +1,30 @@
 package com.dbserver.crud.domain.pessoa;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -72,43 +82,47 @@ class PessoaServiceTest {
         @Autowired
         private PasswordEncoder passwordEnconder;
 
-        // Método Criar Pessoa
-        @Test
-        @DisplayName("Deve ser possível criar uma pessoa ao passar dados corretamente")
-        void deveCriarPessoaPassandoTodosDados() {
-                CriarEnderecoDto criarEnderecoDto = new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
+        @Mock
+        private CriarEnderecoDto criarEnderecoDtoMock;
+        @Mock
+        private CriarEnderecoDto criarEnderecoDtoMock2;
+        @Mock
+        private CriarPessoaDto criarPessoaDtoMockSemEndereco;
+        @Mock
+        private CriarPessoaDto criarPessoaDtoMockComEndereco;
+
+        @BeforeEach
+        void setUp() {
+                this.criarEnderecoDtoMock = new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
                                 "Belo Horizonte", "Ribeiro de Abreu", "31872140", true);
-                List<CriarEnderecoDto> enderecos = List.of(criarEnderecoDto);
-                CriarPessoaDto dto = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15),
+                this.criarEnderecoDtoMock2 = new CriarEnderecoDto("Gêmeos", "1", "Ribeiro de Abreu",
+                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", false);
+
+                this.pessoaMock = new Pessoa(1L, "usuario123", "senha123", "João", LocalDate.of(1990, 5, 15),
                                 "12345678910",
-                                enderecos);
-                Pessoa resposta = this.pessoaService.salvarPessoa(dto);
-                assertEquals(dto.nome(), resposta.getNome());
-                assertEquals(dto.login(), resposta.getLogin());
-                assertEquals(dto.dataNascimento().toString(), resposta.getDataNascimento().toString());
-                assertEquals(dto.cpf(), resposta.getCpf());
-                assertEquals(dto.enderecos().size(), resposta.getEndereco().size());
+                                this.passwordEnconder);
+                this.pessoaMock2 = new Pessoa(2L, "user456", "senha456", "Maria", LocalDate.of(1988, 9, 20),
+                                "98765432109", this.passwordEncoder);
+                this.criarPessoaDtoMockComEndereco = new CriarPessoaDto("temtr", "123456", "Pedro",
+                                LocalDate.of(2000, 12, 15),
+                                "12345678910",
+                                List.of(this.criarEnderecoDtoMock, this.criarEnderecoDtoMock2));
+                this.criarPessoaDtoMockSemEndereco = new CriarPessoaDto("temtr", "123456", "Pedro",
+                                LocalDate.of(2000, 12, 15),
+                                "12345678910",
+                                List.of());
         }
 
         @Test
-        @DisplayName("Deve ser possível criar uma pessoa com mais de um endereço")
-        void deveCriarPessoaComMaisDeUmEndereco() {
-                CriarEnderecoDto criarEnderecoDto = new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
-                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", true);
-
-                CriarEnderecoDto criarEnderecoDto2 = new CriarEnderecoDto("Gêmeos", "1", "Ribeiro de Abreu",
-                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", false);
-
-                List<CriarEnderecoDto> enderecos = List.of(criarEnderecoDto, criarEnderecoDto2);
-                CriarPessoaDto dto = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15),
-                                "12345678910",
-                                enderecos);
-                Pessoa resposta = this.pessoaService.salvarPessoa(dto);
-                assertEquals(dto.nome(), resposta.getNome());
-                assertEquals(dto.login(), resposta.getLogin());
-                assertEquals(dto.dataNascimento().toString(), resposta.getDataNascimento().toString());
-                assertEquals(dto.cpf(), resposta.getCpf());
-                assertEquals(dto.enderecos().size(), resposta.getEndereco().size());
+        @DisplayName("Deve ser possível criar uma pessoa ao passar dados corretamente")
+        void deveCriarPessoaPassandoTodosDados() {
+            
+                Pessoa resposta = this.pessoaService.salvarPessoa(this.criarPessoaDtoMockComEndereco );
+                assertEquals(this.criarPessoaDtoMockComEndereco .nome(), resposta.getNome());
+                assertEquals(this.criarPessoaDtoMockComEndereco .login(), resposta.getLogin());
+                assertEquals(this.criarPessoaDtoMockComEndereco .dataNascimento().toString(), resposta.getDataNascimento().toString());
+                assertEquals(this.criarPessoaDtoMockComEndereco .cpf(), resposta.getCpf());
+                assertEquals(this.criarPessoaDtoMockComEndereco .enderecos().size(), resposta.getEndereco().size());
         }
 
         @Test
@@ -127,42 +141,20 @@ class PessoaServiceTest {
                 assertEquals(dto.enderecos().size(), resposta.getEndereco().size());
         }
 
-        @Test
-        @DisplayName("Não Deve ser possível criar uma pessoa com senha menor que 6 caracteres")
-        void deveFalharAoCriarPessoaComSenhaInvalida() {
-                CriarPessoaDto dto = new CriarPessoaDto("temtr", "12345", "Pedro", LocalDate.of(2000, 12, 15),
-                                "12345678910",
-                                List.of());
-
-                assertThrows(IllegalArgumentException.class, () -> this.pessoaService.salvarPessoa(dto));
+        private static Stream<Arguments> argumentosDadosInvalidosParaCriarPessoa() {
+                return Stream.of(
+                                Arguments.of("temtr", "12345", "Pedro", LocalDate.of(2000, 12, 15), "12345678910"),
+                                Arguments.of("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15), "1234567891"),
+                                Arguments.of(null, "123456", "Pedro", LocalDate.of(2000, 12, 15), "12345678910"),
+                                Arguments.of("temtr", "123456", "Pedro", null, "12345678910"));
         }
 
-        @Test
-        @DisplayName("Não Deve ser possível criar uma pessoa com cpf sem ter exatos 11 caracteres numéricos")
-        void deveFalharAoCriarPessoaComCpfInvalido() {
-                CriarPessoaDto dto = new CriarPessoaDto("temtr", "123456", "Pedro", LocalDate.of(2000, 12, 15),
-                                "1234567891",
-                                List.of());
-
-                assertThrows(IllegalArgumentException.class, () -> this.pessoaService.salvarPessoa(dto));
-        }
-
-        @Test
-        @DisplayName("Não Deve ser possível criar uma pessoa com login nulo")
-        void deveFalharAoCriarPessoaComLoginNulo() {
-                CriarPessoaDto dto = new CriarPessoaDto(null, "123456", "Pedro", LocalDate.of(2000, 12, 15),
-                                "12345678910",
-                                List.of());
-
-                assertThrows(IllegalArgumentException.class, () -> this.pessoaService.salvarPessoa(dto));
-        }
-
-        @Test
-        @DisplayName("Não Deve ser possível criar uma pessoa com data nula")
-        void deveFalharAoCriarPessoaComDataNula() {
-                CriarPessoaDto dto = new CriarPessoaDto("temtr", "123456", "Pedro", null, "12345678910",
-                                List.of());
-
+        @ParameterizedTest
+        @MethodSource("argumentosDadosInvalidosParaCriarPessoa")
+        @DisplayName("Não deve ser possível criar uma pessoa com dados inválidos")
+        void naoDeveSerPossivelCriarPessoaComDadosInvalidos(String login, String senha, String nome,
+                        LocalDate dataNascimento, String cpf) {
+                CriarPessoaDto dto = new CriarPessoaDto(login, senha, nome, dataNascimento, cpf, List.of());
                 assertThrows(IllegalArgumentException.class, () -> this.pessoaService.salvarPessoa(dto));
         }
 
@@ -171,13 +163,7 @@ class PessoaServiceTest {
         @Test
         @DisplayName("Deve ser possível atualizar uma pessoa com datos corretos")
         void deveAtualizarPessoaAoPassarDadosCorretamente() {
-                List<CriarEnderecoDto> enderecos = List.of(new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
-                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", true));
-                CriarPessoaDto criarPessoaDto = new CriarPessoaDto("temtr", "123456", "Pedro",
-                                LocalDate.of(2000, 12, 15),
-                                "12345678910",
-                                enderecos);
-                Pessoa pessoa = new Pessoa(criarPessoaDto, this.passwordEncoderMock);
+                Pessoa pessoa = new Pessoa(this.criarPessoaDtoMockComEndereco , this.passwordEncoderMock);
                 AtualizarDadosPessoaDto novosDados = new AtualizarDadosPessoaDto("Marcos", "654321",
                                 LocalDate.of(2000, 06, 15),
                                 "14815587655");
@@ -197,13 +183,7 @@ class PessoaServiceTest {
         @Test
         @DisplayName("Deve ser possível atualizar somente um campo")
         void deveAtualizarPessoaAoPassarSomenteUmCampo() {
-                List<CriarEnderecoDto> enderecos = List.of(new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
-                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", true));
-                CriarPessoaDto criarPessoaDto = new CriarPessoaDto("temtr", "123456", "Pedro",
-                                LocalDate.of(2000, 12, 15),
-                                "12345678910",
-                                enderecos);
-                Pessoa pessoa = new Pessoa(criarPessoaDto, this.passwordEncoder);
+                Pessoa pessoa = new Pessoa(this.criarPessoaDtoMockComEndereco , this.passwordEncoder);
                 AtualizarDadosPessoaDto novosDados = new AtualizarDadosPessoaDto(null, null, null,
                                 "14815587655");
 
@@ -228,13 +208,8 @@ class PessoaServiceTest {
                         "eu,  ,  "
         })
         void deveFalharAoAtualizarPessoaComDadosInvalidos(String nome, String senha, String cpf) {
-                List<CriarEnderecoDto> enderecos = List.of(new CriarEnderecoDto("Gêmeos", "3", "Ribeiro de Abreu",
-                                "Belo Horizonte", "Ribeiro de Abreu", "31872140", true));
-                CriarPessoaDto criarPessoaDto = new CriarPessoaDto("temtr", "123456", "Pedro",
-                                LocalDate.of(2000, 12, 15),
-                                "12345678910",
-                                enderecos);
-                Pessoa pessoa = new Pessoa(criarPessoaDto, this.passwordEncoder);
+  
+                Pessoa pessoa = new Pessoa(this.criarPessoaDtoMockComEndereco , this.passwordEncoder);
                 AtualizarDadosPessoaDto novosDados = new AtualizarDadosPessoaDto(nome, senha, null, cpf);
 
                 assertThrows(IllegalArgumentException.class,
@@ -244,13 +219,8 @@ class PessoaServiceTest {
         @Test
         @DisplayName("Deve buscar todas pessoas")
         void deveBuscarTodasPessoas() {
-                this.pessoaMock = new Pessoa(1L, "usuario123", "senha123", "João", LocalDate.of(1990, 5, 15),
-                                "12345678910",
-                                this.passwordEnconder);
-                this.pessoaMock2 = new Pessoa(2L, "user456", "senha456", "Maria", LocalDate.of(1988, 9, 20),
-                                "98765432109", this.passwordEncoder);
 
-                List<Pessoa> pessoas = List.of(pessoaMock, pessoaMock2);
+                List<Pessoa> pessoas = List.of(this.pessoaMock, this.pessoaMock2);
                 Page<Pessoa> pagePessoas = new PageImpl<>(pessoas);
 
                 when(this.pessoaRepository.findAll(pageable)).thenReturn(pagePessoas);
@@ -258,28 +228,28 @@ class PessoaServiceTest {
                 List<PessoaRespostaDto> resposta = this.pessoaService.pegarTodasPessoas(pageable);
 
                 // Assertivas para o primeiro objeto Pessoa
-                assertEquals(pessoaMock.getId(), resposta.get(0).id());
-                assertEquals(pessoaMock.getLogin(), resposta.get(0).login());
-                assertEquals(pessoaMock.getNome(), resposta.get(0).nome());
-                assertEquals(pessoaMock.getDataNascimento(), resposta.get(0).dataNascimento());
-                assertEquals(pessoaMock.getCpf(), resposta.get(0).cpf());
+                assertEquals(this.pessoaMock.getId(), resposta.get(0).id());
+                assertEquals(this.pessoaMock.getLogin(), resposta.get(0).login());
+                assertEquals(this.pessoaMock.getNome(), resposta.get(0).nome());
+                assertEquals(this.pessoaMock.getDataNascimento(), resposta.get(0).dataNascimento());
+                assertEquals(this.pessoaMock.getCpf(), resposta.get(0).cpf());
 
                 // Assertivas para o segundo objeto Pessoa, se necessário
-                assertEquals(pessoaMock2.getId(), resposta.get(1).id());
-                assertEquals(pessoaMock2.getLogin(), resposta.get(1).login());
-                assertEquals(pessoaMock2.getNome(), resposta.get(1).nome());
-                assertEquals(pessoaMock2.getDataNascimento(), resposta.get(1).dataNascimento());
-                assertEquals(pessoaMock2.getCpf(), resposta.get(1).cpf());
+                assertEquals(this.pessoaMock2.getId(), resposta.get(1).id());
+                assertEquals(this.pessoaMock2.getLogin(), resposta.get(1).login());
+                assertEquals(this.pessoaMock2.getNome(), resposta.get(1).nome());
+                assertEquals(this.pessoaMock2.getDataNascimento(), resposta.get(1).dataNascimento());
+                assertEquals(this.pessoaMock2.getCpf(), resposta.get(1).cpf());
 
                 assertEquals(pessoas.size(), resposta.size());
 
         }
 
         @Test
-        @DisplayName("Deve retornar lista vazia ao buscar todos endereços quando não houver endereço cadastrado")
-        void deveRetornarListaVaziaAoBuscarTodosEnderecos() {
+        @DisplayName("Deve retornar lista vazia ao buscar todas pessoas quando não houver nenhuma cadastrada")
+        void deveRetornarListaVaziaAoBuscarTodasPessoas() {
 
-                List<Pessoa> pessoas = List.of(pessoaMock, pessoaMock2);
+                List<Pessoa> pessoas = List.of();
                 Page<Pessoa> pagePessoas = new PageImpl<>(pessoas);
 
                 when(this.pessoaRepository.findAll(pageable)).thenReturn(pagePessoas);
@@ -290,4 +260,22 @@ class PessoaServiceTest {
 
         }
 
+        @Test
+        @DisplayName("Deve ser possivel deletar uma pessoa pelo id")
+        void deveDeletarUmaPessoaExistente() {
+                when(this.pessoaRepository.findById(anyLong()))
+                                .thenReturn(Optional.of(this.pessoaMock));
+                assertDoesNotThrow(() -> this.pessoaService.deletarPessoa(anyLong()));
+                verify(this.pessoaRepository).delete(this.pessoaMock);
+        }
+
+        @Test
+        @DisplayName("Deve lançar uma exceção ao tentar deletar pessoa pelo id e pessoa não existir")
+        void deveFalharAoDeletarPessoaQuandoNãoForEncontrada() {
+                when(this.pessoaRepository.findById(anyLong()))
+                                .thenReturn(Optional.empty());
+                Executable deletarPessoa = () -> this.pessoaService.deletarPessoa(anyLong());
+
+                assertThrows(NoSuchElementException.class, deletarPessoa);
+        }
 }

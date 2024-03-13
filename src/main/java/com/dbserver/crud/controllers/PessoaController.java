@@ -58,8 +58,8 @@ public class PessoaController {
     @SecurityRequirement(name = "bearer-key")
     @DeleteMapping("/deletar")
     public ResponseEntity<String> deletarPessoa() {
-        Pessoa pessoa = this.pessoaService.pegarPessoaLogada();
-        this.pessoaService.deletarPessoa(pessoa);
+        Long pessoaid = this.pessoaService.pegarIdDaPessoaLogada();
+        this.pessoaService.deletarPessoa(pessoaid);
         return ResponseEntity.status(HttpStatus.OK).body("Pessoa deletada com sucesso");
     }
 

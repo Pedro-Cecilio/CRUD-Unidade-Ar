@@ -64,8 +64,12 @@ public class PessoaService {
         return pessoas.stream().map(PessoaRespostaDto::new).toList();
     }
 
-    public void deletarPessoa(Pessoa pessoa) {
-        this.pessoaRepository.delete(pessoa);
+    public void deletarPessoa(Long pessoaid) {
+        Optional<Pessoa> pessoaEncontrada = this.pessoaRepository.findById(pessoaid);
+        if(pessoaEncontrada.isEmpty()){
+            throw new NoSuchElementException("Pessoa não encontrada.");
+        }
+        this.pessoaRepository.delete(pessoaEncontrada.get());
     }
 
     public Pessoa pegarPessoaLogada() {
