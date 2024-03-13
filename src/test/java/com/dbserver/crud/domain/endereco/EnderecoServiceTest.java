@@ -54,17 +54,17 @@ class EnderecoServiceTest {
         private EnderecoRepository enderecoRepository;
 
         @Mock
-        private Endereco enderecoMock;
+        private Endereco enderecoMockPrincipalFalse;
 
         @Mock
-        private Endereco enderecoMock2;
+        private Endereco enderecoMockPrincipalTrue;
 
         @Mock
         private Pessoa pessoaMock;
 
         @Mock
         private CriarEnderecoDto criarEnderecoDtoMock;
-        
+
         @Mock
         private AtualizarEnderecoDto atualizarEnderecoDtoMock;
 
@@ -80,9 +80,11 @@ class EnderecoServiceTest {
                                 "12345678910",
                                 this.passwordEnconder);
 
-                this.enderecoMock = new Endereco(1L, "Rua das Rosas", "123", "Centro", "São Paulo", "SP", "12345678",
+                this.enderecoMockPrincipalFalse = new Endereco(1L, "Rua das Rosas", "123", "Centro", "São Paulo", "SP",
+                                "12345678",
                                 false, this.pessoaMock);
-                this.enderecoMock2 = new Endereco(2L, "Rua das Rosas", "123", "Centro", "São Paulo", "SP", "12345678",
+                this.enderecoMockPrincipalTrue = new Endereco(2L, "Rua das Rosas", "123", "Centro", "São Paulo", "SP",
+                                "12345678",
                                 true, this.pessoaMock);
                 this.atualizarEnderecoDtoMock = new AtualizarEnderecoDto("Nova Rua", "456", "Bairro Novo",
                                 "Rio de Janeiro", "RJ", "98765432", true);
@@ -97,7 +99,8 @@ class EnderecoServiceTest {
 
                 when(this.enderecoRepository.findByPessoaIdAndPrincipal(anyLong(), eq(true)))
                                 .thenReturn(Optional.empty());
-                Endereco endereco = this.enderecoService.definirComoEnderecoPrincipal(1L, this.enderecoMock);
+                Endereco endereco = this.enderecoService.definirComoEnderecoPrincipal(1L,
+                                this.enderecoMockPrincipalFalse);
                 verify(this.enderecoRepository).save(endereco);
                 assertEquals(true, endereco.getPrincipal());
         }
@@ -107,8 +110,8 @@ class EnderecoServiceTest {
         void deveSerPossivelDefinirUmEnderecoComoPrincipalQuandoNaoForOPrimeiroPrincipal() {
 
                 when(this.enderecoRepository.findByPessoaIdAndPrincipal(anyLong(), eq(true)))
-                                .thenReturn(Optional.of(enderecoMock2));
-                Endereco endereco = this.enderecoService.definirComoEnderecoPrincipal(2L, enderecoMock);
+                                .thenReturn(Optional.of(enderecoMockPrincipalTrue));
+                Endereco endereco = this.enderecoService.definirComoEnderecoPrincipal(2L, enderecoMockPrincipalFalse);
                 verify(this.enderecoRepository).save(endereco);
                 verify(this.enderecoRepository, times(2)).save(any(Endereco.class));
                 assertEquals(true, endereco.getPrincipal());
@@ -142,6 +145,7 @@ class EnderecoServiceTest {
                                 Arguments.of("Rua das Flores", "123", "Bairro Central", "Belo Horizonte", "MG",
                                                 "31872"));
         }
+
         @ParameterizedTest
         @MethodSource("argumentosDadosInvalidosParaCriarEndereco")
         @DisplayName("Deve falhar ao tentar criar com dados inválidos: rua = {1}, numero = {2}, bairro = {3}, cidade = {4}, estado = {5}, cep = {6}")
@@ -158,7 +162,7 @@ class EnderecoServiceTest {
         void deveSerPossivelAtualizarUmNovoEndereco() {
 
                 when(this.enderecoRepository.findByIdAndPessoaId(anyLong(), anyLong()))
-                                .thenReturn(Optional.of(this.enderecoMock));
+                                .thenReturn(Optional.of(this.enderecoMockPrincipalFalse));
 
                 EnderecoRespostaDto resposta = this.enderecoService.atualizarEndereco(atualizarEnderecoDtoMock, 1L,
                                 this.pessoaMock);
@@ -185,14 +189,17 @@ class EnderecoServiceTest {
 
         private static Stream<Arguments> argumentosDadosInvalidosParaAtualizarEndereco() {
                 return Stream.of(
-                        Arguments.of(" ", "123", "Bairro Central", "Belo Horizonte", "MG", "12345678"),
-                        Arguments.of("Rua das Flores", "abc", "Bairro Central", "Belo Horizonte", "MG", "12345678"),
-                        Arguments.of("Rua das Flores", "123", " ", "Belo Horizonte", "MG", "12345678"),
-                        Arguments.of("Rua das Flores", "123", "Bairro Central", " ", "MG", "12345678"),
-                        Arguments.of("Rua das Flores", "123", "Bairro Central", "Belo Horizonte", " ", "12345678"),
-                        Arguments.of("Rua das Flores", "123", "Bairro Central", "Belo Horizonte", "MG", "31872")
-                );
-            }
+                                Arguments.of(" ", "123", "Bairro Central", "Belo Horizonte", "MG", "12345678"),
+                                Arguments.of("Rua das Flores", "abc", "Bairro Central", "Belo Horizonte", "MG",
+                                                "12345678"),
+                                Arguments.of("Rua das Flores", "123", " ", "Belo Horizonte", "MG", "12345678"),
+                                Arguments.of("Rua das Flores", "123", "Bairro Central", " ", "MG", "12345678"),
+                                Arguments.of("Rua das Flores", "123", "Bairro Central", "Belo Horizonte", " ",
+                                                "12345678"),
+                                Arguments.of("Rua das Flores", "123", "Bairro Central", "Belo Horizonte", "MG",
+                                                "31872"));
+        }
+
         @ParameterizedTest
         @DisplayName("Deve falhar ao tentar atualizar com dados inválidos: rua = {1}, numero = {2}, bairro = {3}, cidade = {4}, estado = {5}, cep = {6}")
         @MethodSource("argumentosDadosInvalidosParaAtualizarEndereco")
@@ -203,7 +210,7 @@ class EnderecoServiceTest {
                                 true);
 
                 when(this.enderecoRepository.findByIdAndPessoaId(anyLong(), anyLong()))
-                                .thenReturn(Optional.of(this.enderecoMock));
+                                .thenReturn(Optional.of(this.enderecoMockPrincipalFalse));
 
                 assertThrows(IllegalArgumentException.class,
                                 () -> this.enderecoService.atualizarEndereco(atualizarEnderecoDtoMock, 1L, pessoaMock));
@@ -212,30 +219,30 @@ class EnderecoServiceTest {
         @Test
         @DisplayName("Deve buscar todos endereços")
         void deveBuscarTodosEnderecos() {
-                List<Endereco> enderecos = List.of(enderecoMock, enderecoMock2);
+                List<Endereco> enderecos = List.of(enderecoMockPrincipalFalse, enderecoMockPrincipalTrue);
                 Page<Endereco> pageEnderecos = new PageImpl<>(enderecos);
 
                 when(this.enderecoRepository.findAllByPessoaId(pageable, 1L)).thenReturn(pageEnderecos);
 
                 List<EnderecoRespostaDto> resposta = this.enderecoService.pegarTodosEnderecos(pageable, 1L);
 
-                assertEquals(enderecoMock.getId(), resposta.get(0).id());
-                assertEquals(enderecoMock.getRua(), resposta.get(0).rua());
-                assertEquals(enderecoMock.getNumero(), resposta.get(0).numero());
-                assertEquals(enderecoMock.getBairro(), resposta.get(0).bairro());
-                assertEquals(enderecoMock.getCidade(), resposta.get(0).cidade());
-                assertEquals(enderecoMock.getEstado(), resposta.get(0).estado());
-                assertEquals(enderecoMock.getCep(), resposta.get(0).cep());
-                assertEquals(enderecoMock.getPrincipal(), resposta.get(0).principal());
+                assertEquals(enderecoMockPrincipalFalse.getId(), resposta.get(0).id());
+                assertEquals(enderecoMockPrincipalFalse.getRua(), resposta.get(0).rua());
+                assertEquals(enderecoMockPrincipalFalse.getNumero(), resposta.get(0).numero());
+                assertEquals(enderecoMockPrincipalFalse.getBairro(), resposta.get(0).bairro());
+                assertEquals(enderecoMockPrincipalFalse.getCidade(), resposta.get(0).cidade());
+                assertEquals(enderecoMockPrincipalFalse.getEstado(), resposta.get(0).estado());
+                assertEquals(enderecoMockPrincipalFalse.getCep(), resposta.get(0).cep());
+                assertEquals(enderecoMockPrincipalFalse.getPrincipal(), resposta.get(0).principal());
 
-                assertEquals(enderecoMock2.getId(), resposta.get(1).id());
-                assertEquals(enderecoMock2.getRua(), resposta.get(1).rua());
-                assertEquals(enderecoMock2.getNumero(), resposta.get(1).numero());
-                assertEquals(enderecoMock2.getBairro(), resposta.get(1).bairro());
-                assertEquals(enderecoMock2.getCidade(), resposta.get(1).cidade());
-                assertEquals(enderecoMock2.getEstado(), resposta.get(1).estado());
-                assertEquals(enderecoMock2.getCep(), resposta.get(1).cep());
-                assertEquals(enderecoMock2.getPrincipal(), resposta.get(1).principal());
+                assertEquals(enderecoMockPrincipalTrue.getId(), resposta.get(1).id());
+                assertEquals(enderecoMockPrincipalTrue.getRua(), resposta.get(1).rua());
+                assertEquals(enderecoMockPrincipalTrue.getNumero(), resposta.get(1).numero());
+                assertEquals(enderecoMockPrincipalTrue.getBairro(), resposta.get(1).bairro());
+                assertEquals(enderecoMockPrincipalTrue.getCidade(), resposta.get(1).cidade());
+                assertEquals(enderecoMockPrincipalTrue.getEstado(), resposta.get(1).estado());
+                assertEquals(enderecoMockPrincipalTrue.getCep(), resposta.get(1).cep());
+                assertEquals(enderecoMockPrincipalTrue.getPrincipal(), resposta.get(1).principal());
 
                 assertEquals(enderecos.size(), resposta.size());
 
@@ -259,9 +266,9 @@ class EnderecoServiceTest {
         @DisplayName("Deve ser possivel deletar um endereço existente, pertencente à pessoa logada na aplicação")
         void deveDeletarUmEnderecoExistente() {
                 when(this.enderecoRepository.findByIdAndPessoaId(anyLong(), anyLong()))
-                                .thenReturn(Optional.of(this.enderecoMock));
+                                .thenReturn(Optional.of(this.enderecoMockPrincipalFalse));
                 assertDoesNotThrow(() -> this.enderecoService.deletarEndereco(anyLong(), anyLong()));
-                verify(this.enderecoRepository).delete(this.enderecoMock);
+                verify(this.enderecoRepository).delete(this.enderecoMockPrincipalFalse);
         }
 
         @Test
@@ -271,5 +278,22 @@ class EnderecoServiceTest {
                 Executable deletarEndereco = () -> this.enderecoService.deletarEndereco(anyLong(), anyLong());
 
                 assertThrows(NoSuchElementException.class, deletarEndereco);
+        }
+
+        @Test
+        @DisplayName("Deve ser possivel buscar o endereco principal pertencente à pessoa logada na aplicação")
+        void devePegarEnderecoPrincipalExistente() {
+                when(this.enderecoRepository.findFirstByPessoaIdAndPrincipalTrue(anyLong()))
+                                .thenReturn(Optional.of(this.enderecoMockPrincipalTrue));
+                EnderecoRespostaDto resposta = this.enderecoService.pegarEnderecoPrincipal(anyLong());
+                assertEquals(this.enderecoMockPrincipalTrue.getPrincipal(), resposta.principal());
+        }
+        @Test
+        @DisplayName("Deve lançar exceção ao buscar o endereco principal pessoa que não o possui")
+        void devefalharAoPegarEnderecoPrincipalInexistente() {
+                when(this.enderecoRepository.findFirstByPessoaIdAndPrincipalTrue(anyLong()))
+                                .thenReturn(Optional.empty());
+                Executable pegarEnderecoPrincipal = () -> this.enderecoService.pegarEnderecoPrincipal(anyLong());
+                assertThrows(NoSuchElementException.class, pegarEnderecoPrincipal );
         }
 }

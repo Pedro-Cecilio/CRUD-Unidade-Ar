@@ -61,8 +61,16 @@ public class EnderecoController {
     @GetMapping
     public ResponseEntity<List<EnderecoRespostaDto>> pegarTodosEnderecos(@ParameterObject Pageable pageable) {
         Long pessoaId = this.pessoaService.pegarIdDaPessoaLogada();
-        List<EnderecoRespostaDto> pessoas = this.enderecoService.pegarTodosEnderecos(pageable, pessoaId);
-        return ResponseEntity.status(HttpStatus.OK).body(pessoas);
+        List<EnderecoRespostaDto> resposta = this.enderecoService.pegarTodosEnderecos(pageable, pessoaId);
+        return ResponseEntity.status(HttpStatus.OK).body(resposta);
+    }
+
+    @SecurityRequirement(name = "bearer-key")
+    @GetMapping("/principal")
+    public ResponseEntity<EnderecoRespostaDto> pegarEnderecoPrincipal() {
+        Long pessoaId = this.pessoaService.pegarIdDaPessoaLogada();
+        EnderecoRespostaDto resposta = this.enderecoService.pegarEnderecoPrincipal(pessoaId);
+        return ResponseEntity.status(HttpStatus.OK).body(resposta);
     }
 
     @SecurityRequirement(name = "bearer-key")
@@ -78,5 +86,7 @@ public class EnderecoController {
             throw new NoSuchElementException("Endereço não encontrado.");
         }
     }
+
+
 
 }

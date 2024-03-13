@@ -71,4 +71,12 @@ public class EnderecoService {
         }
         this.enderecoRepository.delete(endereco.get());
     }
+
+    public EnderecoRespostaDto pegarEnderecoPrincipal(Long pessoaId) {
+        Optional<Endereco> endereco = this.enderecoRepository.findFirstByPessoaIdAndPrincipalTrue(pessoaId);
+        if(endereco.isEmpty()){
+            throw new NoSuchElementException("Pessoa não possui endereço principal cadastrado.");
+        }
+        return new EnderecoRespostaDto(endereco.get());
+    }
 }
