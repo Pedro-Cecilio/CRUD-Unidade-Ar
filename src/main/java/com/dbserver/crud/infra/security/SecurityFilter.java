@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.dbserver.crud.domain.pessoa.Pessoa;
 import com.dbserver.crud.domain.pessoa.PessoaRepository;
-import com.dbserver.crud.infra.excecao.ResponseError;
+import com.dbserver.crud.infra.excecao.RespostaErro;
 import com.dbserver.crud.infra.excecao.novasExcecoes.ValidarJwtExeption;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -62,7 +62,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     public void respostaErro(HttpServletResponse response) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        ResponseError<String> responseError = new ResponseError<>("Token inválido");
+        RespostaErro responseError = new RespostaErro("Token inválido");
         String tokenErrorResponse = mapper.writeValueAsString(responseError);
         
         response.setStatus(401);

@@ -15,7 +15,7 @@ public record AtualizarDadosPessoaDto(
 
         LocalDate dataNascimento,
 
-        @Pattern(regexp = Utils.REGEX_CPF, message = "O cpf deve conter 11 caracteres numéricos" )
+        @Pattern(regexp = Utils.REGEX_CPF, message = "Cpf deve conter 11 caracteres numéricos" )
         String cpf
 
         ) {

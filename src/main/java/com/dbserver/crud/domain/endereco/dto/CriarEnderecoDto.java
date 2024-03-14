@@ -7,20 +7,20 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record CriarEnderecoDto(
-    @NotBlank
+    @NotBlank(message = "Rua deve ser informada")
     String rua,
 
     @NotBlank
     @Pattern(regexp = Utils.REGEX_NUMERO_ENDERECO, message = "Número com formato inválido")
     String numero,
 
-    @NotBlank
+    @NotBlank(message = "Bairro deve ser informado")
     String bairro,
 
-    @NotBlank
+    @NotBlank(message = "Cidade deve ser informada")
     String cidade,
     
-    @NotBlank
+    @NotBlank(message = "Estado deve ser informado")
     String estado,
 
     @Pattern(regexp = Utils.REGEX_CEP, message = "Cep com formato inválido")

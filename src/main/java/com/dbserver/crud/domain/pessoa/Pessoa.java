@@ -49,7 +49,7 @@ public class Pessoa implements UserDetails {
     private LocalDate dataNascimento;
 
     @Column(unique = true, nullable = false)
-    @Size(min = 11, max = 11, message = "Cpf deve conter 11 caracteres.")
+    @Size(min = 11, max = 11, message = "Cpf deve conter 11 caracteres numéricos")
     private String cpf;
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "pessoa")
@@ -93,7 +93,7 @@ public class Pessoa implements UserDetails {
     }
 
     public void setLogin(String login) {
-        if (login == null)
+        if (login == null || login.trim().isEmpty())
             throw new IllegalArgumentException("Login deve ser informado");
         if (login.length() < 5)
             throw new IllegalArgumentException("Login deve ter no mínimo 5 caracteres");
@@ -102,7 +102,7 @@ public class Pessoa implements UserDetails {
 
     public void setSenha(String senha, PasswordEncoder passwordEnconder) {
         if (senha == null || senha.length() < 6) {
-            throw new IllegalArgumentException("A senha deve conter no mínimo 6 caracteres");
+            throw new IllegalArgumentException("Senha deve conter no mínimo 6 caracteres");
         }
         this.senha = passwordEnconder.encode(senha);
     }
@@ -126,7 +126,7 @@ public class Pessoa implements UserDetails {
         if (cpf == null)
             throw new IllegalArgumentException("Cpf deve ser informado");
         if (!validarRegex(Utils.REGEX_CPF, cpf))
-            throw new IllegalArgumentException("Cpf deve ter 11 caracteres numéricos");
+            throw new IllegalArgumentException("Cpf deve conter 11 caracteres numéricos");
         this.cpf = cpf;
     }
 

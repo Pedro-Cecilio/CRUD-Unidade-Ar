@@ -12,23 +12,20 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record CriarPessoaDto(
-        @NotBlank
-        @Size(min = 5, message = "Deve ter no mínimo 5 caracteres")
+        @Size(min = 5, message = "Login deve ter no mínimo 5 caracteres")
         String login,
 
-        @NotBlank
-        @Size(min = 6, message = "A senha deve conter no mínimo 6 caracteres")
+        @Size(min = 6, message = "Senha deve conter no mínimo 6 caracteres")
         String senha,
 
-        @NotBlank
         @Size(min = 3, message = "Nome deve ter no mínimo 3 caracteres")
         String nome,
 
         @JsonDeserialize(using = LocalDateDeserializer.class)
         LocalDate dataNascimento,
 
-        @NotBlank
-        @Pattern(regexp = Utils.REGEX_CPF, message = "O cpf deve conter 11 caracteres numéricos" )
+        @NotBlank(message = "Cpf deve ser informado")
+        @Pattern(regexp = Utils.REGEX_CPF, message = "Cpf deve conter 11 caracteres numéricos" )
         String cpf,
 
         List<CriarEnderecoDto> enderecos
