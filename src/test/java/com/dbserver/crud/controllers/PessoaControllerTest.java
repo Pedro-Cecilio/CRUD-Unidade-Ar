@@ -255,7 +255,6 @@ class PessoaControllerTest {
                 .andReturn().getResponse();
 
         assertThat(resposta.getStatus()).isEqualTo(HttpStatus.OK.value());
-
     }
 
     @Test

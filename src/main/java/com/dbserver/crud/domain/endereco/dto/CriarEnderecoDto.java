@@ -11,7 +11,7 @@ public record CriarEnderecoDto(
     String rua,
 
     @NotBlank
-    @Pattern(regexp = Utils.REGEX_NUMERO_ENDERECO, message = "Número com formato inválido")
+    @Pattern(regexp = Utils.REGEX_NUMERO_ENDERECO, message = "Número deve ter somente caracteres numéricos")
     String numero,
 
     @NotBlank(message = "Bairro deve ser informado")
@@ -23,7 +23,7 @@ public record CriarEnderecoDto(
     @NotBlank(message = "Estado deve ser informado")
     String estado,
 
-    @Pattern(regexp = Utils.REGEX_CEP, message = "Cep com formato inválido")
+    @Pattern(regexp = Utils.REGEX_CEP, message = "Cep deve ter 8 caracteres numéricos")
     @NotBlank
     String cep,
 

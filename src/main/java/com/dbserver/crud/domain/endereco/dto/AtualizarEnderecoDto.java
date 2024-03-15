@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 public record AtualizarEnderecoDto(
     String rua,
 
-    @Pattern(regexp = Utils.REGEX_NUMERO_ENDERECO, message = "Número com formato inválido")
+    @Pattern(regexp = Utils.REGEX_NUMERO_ENDERECO, message = "Número deve ter somente caracteres numéricos")
     String numero,
 
     String bairro,
@@ -16,7 +16,7 @@ public record AtualizarEnderecoDto(
     
     String estado,
 
-    @Pattern(regexp = Utils.REGEX_CEP, message = "Cep com formato inválido")
+    @Pattern(regexp = Utils.REGEX_CEP, message = "Cep deve ter 8 caracteres numéricos")
     String cep,
 
     Boolean principal

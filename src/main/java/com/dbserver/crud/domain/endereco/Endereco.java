@@ -77,12 +77,12 @@ public class Endereco {
     }
 
     public void atualizarDados(AtualizarEnderecoDto dados) {
-        setRua(dados.rua());
-        setNumero(dados.numero());
-        setBairro(dados.bairro());
-        setCidade(dados.cidade());
-        setEstado(dados.estado());
-        setCep(dados.cep());
+        setRua(dados.rua() != null && !dados.rua().isEmpty() ? dados.rua() : this.rua);
+        setNumero(dados.numero() != null && !dados.numero().isEmpty() ? dados.numero() : this.numero);
+        setBairro(dados.bairro() != null && !dados.bairro().isEmpty() ? dados.bairro() : this.bairro);
+        setCidade(dados.cidade() != null && !dados.cidade().isEmpty() ? dados.cidade() : this.cidade);
+        setEstado(dados.estado() != null && !dados.estado().isEmpty() ? dados.estado() : this.estado);
+        setCep(dados.cep() != null && !dados.cep().isEmpty() ? dados.cep() : this.cep);
     }
 
     public void setPrincipal(Boolean principal) {
@@ -110,7 +110,7 @@ public class Endereco {
         if (cep == null)
             throw new IllegalArgumentException("Cep deve ser informado");
         if (!validarRegex(Utils.REGEX_CEP, cep))
-            throw new IllegalArgumentException("Número deve ter 8 caracteres numéricos");
+            throw new IllegalArgumentException("Cep deve ter 8 caracteres numéricos");
         this.cep = cep;
     }
 

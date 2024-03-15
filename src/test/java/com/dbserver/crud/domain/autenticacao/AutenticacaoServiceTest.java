@@ -23,7 +23,7 @@ import com.dbserver.crud.infra.security.TokenService;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
-public class AutenticacaoServiceTest {
+class AutenticacaoServiceTest {
 
     @InjectMocks
     private AutenticacaoService autenticacaoService;
@@ -50,7 +50,6 @@ public class AutenticacaoServiceTest {
                                 "12345678910",
                                 this.passwordEnconder);
     }
-    
     @Test
     @DisplayName("Deve ser possível se autenticar ao passar dados válidos")
     void deveSerPossivelSeAutenticarAoPassarDadosValidos() {
