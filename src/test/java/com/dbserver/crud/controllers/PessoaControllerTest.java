@@ -18,10 +18,9 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import com.dbserver.crud.controllers.utils.TesteUtils;
 import com.dbserver.crud.domain.endereco.dto.CriarEnderecoDto;
 import com.dbserver.crud.domain.pessoa.Pessoa;
 import com.dbserver.crud.domain.pessoa.PessoaRepository;
@@ -81,16 +80,12 @@ class PessoaControllerTest {
         this.pessoaLogada = pessoas.get(0);
     }
 
-    private void login(Pessoa pessoa) {
-        var auth = new UsernamePasswordAuthenticationToken(pessoa, null,
-                pessoa.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-    }
+    
 
     @BeforeEach
     void setUp() {
         this.popularBanco();
-        this.login(this.pessoaLogada);
+        TesteUtils.login(this.pessoaLogada);
     }
 
     @AfterEach
